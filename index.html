@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<!-- Garantia técnica de privacidade: o navegador é proibido de enviar dados para qualquer lugar (connect-src 'none'). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>B ❤ H · Nossa conversa em números</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E❤️%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#fff1f5; --bg2:#ffd9e4; --bg3:#ffc2d4;
+  --ink:#4a0d24; --ink-soft:#8a4a60;
+  --red:#e11d48; --crimson:#be123c; --pink:#ff4f8b; --rose:#ff8fb1; --blush:#ffe3ea; --cream:#fff8f6;
+  --a:#e11d48; --b:#f06bb0;
+  --card:rgba(255,255,255,.84);
+  --shadow:0 18px 50px -20px rgba(190,18,60,.38), 0 4px 14px -6px rgba(190,18,60,.18);
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Nunito',system-ui,'Segoe UI',Roboto,sans-serif;color:var(--ink);line-height:1.5;
+  background:linear-gradient(160deg,var(--bg1),var(--bg2) 55%,var(--bg3));background-attachment:fixed;
+  min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pink);outline-offset:3px;border-radius:10px}
+
+/* corações flutuando ao fundo */
+.floaters{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.floaters span{position:absolute;bottom:-60px;opacity:0;animation:rise linear infinite;filter:drop-shadow(0 4px 6px rgba(225,29,72,.18))}
+@keyframes rise{
+  0%{transform:translate(0,0) scale(.6) rotate(0);opacity:0}
+  10%{opacity:.8}
+  50%{transform:translate(var(--sway),-55vh) scale(1) rotate(12deg)}
+  100%{transform:translate(calc(var(--sway) * -1),-118vh) scale(.8) rotate(-10deg);opacity:0}
+}
+.hero,main,footer{position:relative;z-index:1}
+
+/* topo / logo */
+.hero{text-align:center;padding:34px 18px 4px;max-width:900px;margin:0 auto}
+.logo{width:min(400px,84vw);height:auto;display:block;margin:0 auto;cursor:pointer;filter:drop-shadow(0 16px 18px rgba(190,18,60,.3));transition:width .6s ease}
+.logo .sway-b{transform-box:fill-box;transform-origin:50% 100%;animation:swayb 3.2s ease-in-out infinite}
+.logo .sway-h{transform-box:fill-box;transform-origin:50% 100%;animation:swayh 3.2s ease-in-out infinite}
+@keyframes swayb{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(4deg)}}
+@keyframes swayh{0%,100%{transform:rotate(2.5deg)}50%{transform:rotate(-4deg)}}
+.logo .heartbeat{transform-box:fill-box;transform-origin:center;animation:beat 1.4s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}14%{transform:scale(1.2)}28%{transform:scale(1)}42%{transform:scale(1.13)}}
+.logo .eye{transform-box:fill-box;transform-origin:center;animation:blink 4.5s infinite}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.logo .spark{transform-box:fill-box;transform-origin:center;animation:twinkle 2.4s ease-in-out infinite}
+.logo .spark:nth-of-type(2){animation-delay:.8s}.logo .spark:nth-of-type(3){animation-delay:1.5s}
+@keyframes twinkle{0%,100%{transform:scale(.4) rotate(0);opacity:.3}50%{transform:scale(1.1) rotate(35deg);opacity:1}}
+.logo .mini{transform-box:fill-box;transform-origin:center;opacity:0;animation:floatheart 3.4s ease-in infinite}
+.logo .m2{animation-delay:1.1s}.logo .m3{animation-delay:2.2s}
+@keyframes floatheart{0%{transform:translateY(8px) scale(.4);opacity:0}25%{opacity:1}100%{transform:translateY(-34px) scale(1);opacity:0}}
+
+h1.title{font-family:'Pacifico',cursive;font-weight:400;font-size:clamp(2rem,6.4vw,3.5rem);line-height:1.15;color:var(--crimson);margin-top:6px;text-shadow:0 3px 0 #fff,0 10px 26px rgba(225,29,72,.25)}
+.tagline{max-width:560px;margin:10px auto 0;color:var(--ink-soft);font-size:1.08rem}
+body.loaded .logo{width:190px}
+body.loaded .tagline{display:none}
+body.loaded .hero{padding-top:18px}
+
+/* importação */
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 40px}
+.drop{margin:26px auto 0;max-width:640px;padding:30px 22px 22px;text-align:center;border-radius:34px;background:var(--card);border:3px dashed var(--rose);box-shadow:var(--shadow);backdrop-filter:blur(8px);transition:transform .25s,border-color .25s,background .25s}
+.drop.drag{transform:scale(1.03);border-color:var(--red);background:#fff}
+.drop .envelope{font-size:3rem;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
+.drop h2{font-family:'Pacifico',cursive;font-weight:400;color:var(--crimson);font-size:1.5rem;margin:4px 0 2px}
+.drop p{color:var(--ink-soft)}
+.btn{margin-top:16px;border:0;cursor:pointer;padding:14px 30px;border-radius:99px;font-weight:800;font-size:1.05rem;color:#fff;background:linear-gradient(135deg,var(--pink),var(--red));box-shadow:0 12px 26px -10px rgba(225,29,72,.7),inset 0 2px 0 rgba(255,255,255,.35);transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 18px 30px -10px rgba(225,29,72,.75),inset 0 2px 0 rgba(255,255,255,.35)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:#fff;color:var(--crimson);box-shadow:0 6px 16px -8px rgba(190,18,60,.5);border:2px solid var(--rose);padding:9px 20px;margin:0;font-size:.92rem}
+.lock{margin-top:16px;font-size:.88rem;color:var(--ink-soft);background:var(--blush);border-radius:18px;padding:10px 14px}
+details.how{margin-top:12px;text-align:left;font-size:.92rem;color:var(--ink-soft)}
+details.how summary{cursor:pointer;font-weight:800;color:var(--crimson);text-align:center;list-style:none}
+details.how summary::-webkit-details-marker{display:none}
+details.how div{margin-top:10px;padding:12px 14px;background:#fff;border-radius:16px}
+details.how b{color:var(--ink)}
+.err{max-width:640px;margin:18px auto 0;padding:14px 18px;border-radius:20px;background:#fff;border:2px solid var(--red);color:var(--crimson);font-weight:700;text-align:center;animation:shake .5s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* carregando */
+.loader{position:fixed;inset:0;z-index:60;display:grid;place-content:center;justify-items:center;gap:14px;background:rgba(255,235,241,.93);backdrop-filter:blur(10px);text-align:center}
+.loader[hidden]{display:none}
+.loader svg{width:120px;animation:beat2 1s ease-in-out infinite;filter:drop-shadow(0 10px 14px rgba(190,18,60,.35))}
+@keyframes beat2{0%,100%{transform:scale(1)}30%{transform:scale(1.25)}60%{transform:scale(.95)}}
+.loader p{font-family:'Pacifico',cursive;font-size:1.3rem;color:var(--crimson);min-height:2em}
+
+/* barra de ferramentas */
+.toolbar{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 18px;border-radius:24px;background:var(--card);box-shadow:var(--shadow)}
+.toolbar .names{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-weight:700;font-size:.9rem;color:var(--ink-soft)}
+.toolbar label{display:flex;align-items:center;gap:6px}
+.toolbar input{border:2px solid var(--blush);background:#fff;border-radius:12px;padding:6px 10px;width:130px;font-weight:700}
+.toolbar input:focus{border-color:var(--pink);outline:none}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--c)}
+
+/* destaques */
+.hls{margin-top:22px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.hl{position:relative;padding:20px 18px 16px;border-radius:26px;background:var(--card);box-shadow:var(--shadow);cursor:pointer;overflow:hidden;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.hl:hover{transform:translateY(-5px) rotate(-1deg)}
+.hl .hi{font-size:1.9rem;display:block;line-height:1}
+.hl .hn{display:block;font-weight:900;font-size:clamp(1.9rem,4.6vw,2.7rem);line-height:1.1;margin-top:8px;color:var(--crimson);letter-spacing:-.02em}
+.hl small{display:block;color:var(--ink-soft);font-weight:700;margin-top:2px}
+.hl.big{grid-column:span 2;background:linear-gradient(135deg,var(--pink),var(--red));color:#fff}
+.hl.big .hn,.hl.big small{color:#fff}
+.hl.big .hn{font-size:clamp(2.6rem,7vw,4rem)}
+.hl.solid{background:linear-gradient(150deg,#ff6b8f,#c81e4a);color:#fff}
+.hl.solid .hn,.hl.solid small{color:#fff}
+.hl.big::after,.hl.solid::after{content:"❤";position:absolute;right:-12px;bottom:-26px;font-size:7rem;color:rgba(255,255,255,.14);transform:rotate(-14deg)}
+@media(max-width:560px){.hl.big{grid-column:auto}}
+
+/* cartões */
+section.card{margin-top:24px;padding:26px clamp(16px,3vw,32px) 28px;border-radius:30px;background:var(--card);backdrop-filter:blur(10px);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.9)}
+section.card:nth-of-type(even){border-radius:30px 56px 30px 56px}
+h2.sec{font-family:'Pacifico',cursive;font-weight:400;font-size:clamp(1.4rem,3.4vw,1.9rem);color:var(--crimson);display:flex;gap:10px;align-items:center;line-height:1.2}
+.sub{color:var(--ink-soft);margin:4px 0 18px;max-width:70ch}
+h3{font-size:1.05rem;font-weight:800;margin:20px 0 10px;color:var(--ink)}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.two{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.pn{color:var(--c);font-weight:800}
+
+/* barras */
+.bar{height:12px;border-radius:99px;background:var(--blush);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--red));transition:width 1.3s cubic-bezier(.2,.8,.2,1)}
+.in .bar>i{width:var(--w)}
+.bar>i.ca{background:var(--a)}.bar>i.cb{background:var(--b)}
+.split{display:flex;height:22px;border-radius:99px;overflow:hidden;background:var(--blush)}
+.split>i{display:block;height:100%;width:0;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.in .split>i{width:var(--w)}
+.split>i:first-child{background:var(--a)}.split>i:last-child{background:var(--b)}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin:9px 0}
+.row .lbl{font-weight:800;min-width:2ch}.row .val{font-weight:800;color:var(--crimson);font-variant-numeric:tabular-nums}
+.row small{color:var(--ink-soft);display:block;font-weight:600;font-size:.8rem}
+.mut{color:var(--ink-soft);font-size:.9rem}
+
+/* quem fala */
+.who{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.who>div{padding:16px;border-radius:22px;background:#fff;text-align:center}
+.who .big{display:block;font-size:clamp(2rem,6vw,3rem);font-weight:900;color:var(--c);line-height:1.1}
+.who .nm{font-weight:800;color:var(--c);font-size:1.1rem;overflow-wrap:anywhere}
+.who small{display:block;color:var(--ink-soft);font-weight:600}
+
+/* gráfico */
+.ctrls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.seg{display:inline-flex;background:var(--blush);border-radius:99px;padding:4px;gap:2px}
+.seg button{border:0;background:transparent;padding:7px 15px;border-radius:99px;font-weight:800;font-size:.86rem;color:var(--crimson);cursor:pointer;transition:background .2s,color .2s}
+.seg button.on{background:linear-gradient(135deg,var(--pink),var(--red));color:#fff;box-shadow:0 6px 14px -6px rgba(225,29,72,.7)}
+.chart{position:relative;background:#fff;border-radius:22px;padding:10px 6px 4px}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .ln{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.8s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.chart text{font-size:11px;fill:var(--ink-soft);font-weight:700}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;padding:8px 12px;border-radius:14px;font-size:.82rem;transform:translate(-50%,-115%);white-space:nowrap;opacity:0;transition:opacity .15s;z-index:3;line-height:1.35}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-weight:800;font-size:.9rem}
+
+/* emojis */
+.rank{display:grid;grid-template-columns:auto auto 1fr;gap:6px 14px;align-items:center;padding:12px 14px;border-radius:22px;background:#fff;margin-bottom:10px}
+.rank .medal{font-size:1.4rem}
+.rank .em{font-size:2.5rem;line-height:1;transition:transform .3s cubic-bezier(.3,1.8,.5,1)}
+.rank:hover .em{transform:scale(1.3) rotate(-8deg)}
+.rank .info b{font-size:1.2rem;color:var(--crimson)}
+.rank .info small{display:block;color:var(--ink-soft);font-weight:700}
+.rank .split{grid-column:1/-1;height:10px}
+.stat{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:16px}
+.stat>div{background:#fff;border-radius:20px;padding:12px 14px}
+.stat b{display:block;font-size:1.5rem;font-weight:900;color:var(--crimson);line-height:1.2}
+.stat small{color:var(--ink-soft);font-weight:700}
+
+/* momentos */
+.periods{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.per{background:#fff;border-radius:22px;padding:16px}
+.per .pi{font-size:1.8rem}
+.per b{display:block;font-size:1.9rem;font-weight:900;color:var(--crimson);line-height:1.1}
+.per small{color:var(--ink-soft);font-weight:700;display:block}
+.per .split{height:8px;margin-top:10px}
+.hours{display:flex;align-items:flex-end;gap:4px;height:170px;padding:10px 6px 0;background:#fff;border-radius:22px}
+.hours .hb{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;font-size:10px;color:var(--ink-soft);font-weight:700;min-width:0}
+.hours .hb i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,var(--pink),var(--rose));height:0;transition:height 1.2s cubic-bezier(.2,.8,.2,1)}
+.in .hours .hb i{height:var(--h)}
+.hours .hb.peak i{background:linear-gradient(180deg,var(--red),var(--crimson))}
+.hours .hb.peak::before{content:"❤";color:var(--red);font-size:14px;animation:beat2 1.2s infinite}
+.hours .hb span{height:16px;margin-top:2px}
+.heatwrap{overflow-x:auto;background:#fff;border-radius:22px;padding:12px}
+.heat-grid{display:grid;grid-template-columns:34px repeat(24,minmax(0,1fr));gap:3px;min-width:520px}
+.heat-grid i{font-style:normal;font-size:10px;font-weight:700;color:var(--ink-soft);text-align:center}
+.heat-grid .hc{aspect-ratio:1;border-radius:5px;background:rgba(225,29,72,calc(.06 + var(--v) * .94))}
+.heat-grid .hd{text-align:right;padding-right:4px;align-self:center}
+
+/* palavras */
+.cloud{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;align-items:baseline;padding:18px 12px;background:#fff;border-radius:24px;min-height:120px}
+.cloud span{font-weight:900;line-height:1.1;animation:pop-in .6s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--d);cursor:default;transition:transform .2s}
+.cloud span:hover{transform:scale(1.18) rotate(-3deg)}
+@keyframes pop-in{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* amor */
+.love{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.lv{position:relative;overflow:hidden;border-radius:26px;padding:20px;color:#fff;text-align:center;background:linear-gradient(145deg,#ff6b8f,#c81e4a);box-shadow:0 14px 28px -14px rgba(190,18,60,.7);cursor:pointer}
+.lv:nth-child(2){background:linear-gradient(145deg,#ff4f8b,#e11d48)}
+.lv:nth-child(3){background:linear-gradient(145deg,#ff9ec0,#f0568f)}
+.lv .q{font-family:'Pacifico',cursive;font-size:1.25rem}
+.lv .n{display:block;font-size:3.4rem;font-weight:900;line-height:1.1;margin:4px 0;text-shadow:0 4px 0 rgba(0,0,0,.12)}
+.lv small{display:block;font-weight:700;opacity:.95}
+.lv::after{content:"💗";position:absolute;font-size:5.5rem;right:-14px;bottom:-22px;opacity:.2;animation:beat2 1.6s infinite}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{background:#fff;border-radius:99px;padding:7px 14px;font-weight:800;color:var(--crimson);box-shadow:0 4px 12px -8px rgba(190,18,60,.6)}
+.chip em{font-style:normal;color:var(--ink);margin-left:6px}
+.pop{position:fixed;z-index:70;pointer-events:none;animation:pop 1.2s ease-out forwards}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.3) rotate(20deg);opacity:0}}
+
+/* retrospectiva */
+.retro{list-style:none;padding:0;display:grid;gap:10px}
+.retro li{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:20px;padding:12px 16px;opacity:0;transform:translateX(-16px)}
+.in .retro li{animation:slide .7s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:var(--d)}
+@keyframes slide{to{opacity:1;transform:none}}
+.retro li span{font-size:1.5rem;line-height:1.3}
+.retro li b{color:var(--crimson)}
+.quote{position:relative;background:#fff;border-radius:24px;padding:20px 22px 18px 54px;max-height:260px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.quote::before{content:"“";position:absolute;left:14px;top:-4px;font-family:'Pacifico',cursive;font-size:4rem;color:var(--rose)}
+select{border:2px solid var(--blush);background:#fff;border-radius:14px;padding:7px 12px;font-weight:800;color:var(--crimson);cursor:pointer}
+
+footer{text-align:center;padding:10px 18px 46px;color:var(--ink-soft);font-weight:700}
+footer b{color:var(--crimson)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .floaters{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="floaters" id="floaters" aria-hidden="true"></div>
+
+<header class="hero" id="hero">
+  <svg class="logo" id="logo" viewBox="0 0 300 140" role="img" aria-label="Logo: B, um coração e H">
+    <defs>
+      <linearGradient id="gB" gradientUnits="userSpaceOnUse" x1="0" y1="14" x2="0" y2="116"><stop offset="0" stop-color="#ff6b87"/><stop offset="1" stop-color="#e11d48"/></linearGradient>
+      <linearGradient id="gH" gradientUnits="userSpaceOnUse" x1="0" y1="14" x2="0" y2="116"><stop offset="0" stop-color="#ffb3cc"/><stop offset="1" stop-color="#f0568f"/></linearGradient>
+      <linearGradient id="gHeart" gradientUnits="userSpaceOnUse" x1="0" y1="-30" x2="0" y2="26"><stop offset="0" stop-color="#ff7a95"/><stop offset="1" stop-color="#d4103f"/></linearGradient>
+    </defs>
+
+    <g fill="#fff" stroke="#ffb3c7" stroke-width="1">
+      <path class="spark" d="M32 22 L34 29 L41 31 L34 33 L32 40 L30 33 L23 31 L30 29 Z"/>
+      <path class="spark" d="M268 20 L270 26 L276 28 L270 30 L268 36 L266 30 L260 28 L266 26 Z"/>
+      <path class="spark" d="M150 10 L151.6 15 L156.6 16.6 L151.6 18.2 L150 23.2 L148.4 18.2 L143.4 16.6 L148.4 15 Z"/>
+    </g>
+
+    <!-- B -->
+    <g class="sway-b">
+      <path d="M50 25 V105 M50 25 H72 a19 19 0 0 1 0 38 H50 M50 63 H76 a21 21 0 0 1 0 42 H50" fill="none" stroke="#5b0f2b" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M50 25 V105 M50 25 H72 a19 19 0 0 1 0 38 H50 M50 63 H76 a21 21 0 0 1 0 42 H50" fill="none" stroke="url(#gB)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M43 34 V92" stroke="#fff" stroke-opacity=".5" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <ellipse class="eye" cx="45" cy="47" rx="2.6" ry="3.4" fill="#3b0a1d"/><circle cx="45.9" cy="45.8" r=".9" fill="#fff"/>
+      <ellipse class="eye" cx="55" cy="47" rx="2.6" ry="3.4" fill="#3b0a1d"/><circle cx="55.9" cy="45.8" r=".9" fill="#fff"/>
+      <path d="M46.5 54 Q50 58.5 53.5 54" fill="none" stroke="#3b0a1d" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="41" cy="53" rx="3.2" ry="2" fill="#ff7aa2" opacity=".85"/><ellipse cx="59" cy="53" rx="3.2" ry="2" fill="#ff7aa2" opacity=".85"/>
+    </g>
+
+    <!-- coração -->
+    <g transform="translate(150 70) scale(1.1)">
+      <g class="mini"><path transform="translate(-6 -34) scale(.28)" d="M0 24 C-38 -2 -28 -34 -9 -29 C-4 -27.5 0 -22 0 -17 C0 -22 4 -27.5 9 -29 C28 -34 38 -2 0 24 Z" fill="#ff4f8b"/></g>
+      <g class="mini m2"><path transform="translate(12 -30) scale(.2)" d="M0 24 C-38 -2 -28 -34 -9 -29 C-4 -27.5 0 -22 0 -17 C0 -22 4 -27.5 9 -29 C28 -34 38 -2 0 24 Z" fill="#ff8fb1"/></g>
+      <g class="mini m3"><path transform="translate(-14 -28) scale(.2)" d="M0 24 C-38 -2 -28 -34 -9 -29 C-4 -27.5 0 -22 0 -17 C0 -22 4 -27.5 9 -29 C28 -34 38 -2 0 24 Z" fill="#e11d48"/></g>
+      <g class="heartbeat">
+        <path d="M0 24 C-38 -2 -28 -34 -9 -29 C-4 -27.5 0 -22 0 -17 C0 -22 4 -27.5 9 -29 C28 -34 38 -2 0 24 Z" fill="url(#gHeart)" stroke="#5b0f2b" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M-18 -17 C-23 -14 -25 -7 -22 -1" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="4.5" stroke-linecap="round"/>
+      </g>
+    </g>
+
+    <!-- H -->
+    <g class="sway-h">
+      <path d="M205 25 V105 M255 25 V105 M205 65 H255" fill="none" stroke="#5b0f2b" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M205 25 V105 M255 25 V105 M205 65 H255" fill="none" stroke="url(#gH)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M198 34 V92 M248 34 V92" stroke="#fff" stroke-opacity=".55" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <ellipse class="eye" cx="200" cy="43" rx="2.6" ry="3.4" fill="#3b0a1d"/><circle cx="200.9" cy="41.8" r=".9" fill="#fff"/>
+      <ellipse class="eye" cx="210" cy="43" rx="2.6" ry="3.4" fill="#3b0a1d"/><circle cx="210.9" cy="41.8" r=".9" fill="#fff"/>
+      <path d="M201.5 50 Q205 54.5 208.5 50" fill="none" stroke="#3b0a1d" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="196" cy="49" rx="3.2" ry="2" fill="#ff5c8f" opacity=".8"/><ellipse cx="214" cy="49" rx="3.2" ry="2" fill="#ff5c8f" opacity=".8"/>
+    </g>
+  </svg>
+  <h1 class="title">Nossa conversa em números</h1>
+  <p class="tagline">Importe a conversa de vocês no WhatsApp e descubra quanto amor cabe em mensagens.</p>
+</header>
+
+<main class="wrap">
+  <section class="drop" id="drop">
+    <div class="envelope">💌</div>
+    <h2>Traga a conversa de vocês</h2>
+    <p>Arraste o arquivo (.txt ou .zip) para cá ou escolha no seu aparelho.</p>
+    <button class="btn" id="pick" type="button">Importar conversa (.txt ou .zip)</button>
+    <div class="lock">🔒 Tudo acontece só no seu navegador. O arquivo não é enviado nem guardado em lugar nenhum: ao recarregar a página, tudo some.</div>
+    <details class="how">
+      <summary>Como exportar a conversa do WhatsApp?</summary>
+      <div>
+        <b>Android:</b> abra a conversa, toque nos três pontinhos, depois em Mais, Exportar conversa e escolha <b>Sem mídia</b>. Pode importar o .txt ou o .zip que o WhatsApp gerar.<br><br>
+        <b>iPhone:</b> abra a conversa, toque no nome no topo, depois em Exportar conversa e escolha <b>Sem mídia</b>. O iPhone gera um .zip: é só importar o zip aqui, sem precisar abrir. Ele também aceita .zip com contatos (.vcf) junto; esses arquivos são ignorados.
+      </div>
+    </details>
+  </section>
+  <div id="err" class="err" hidden></div>
+  <div id="app" hidden></div>
+</main>
+
+<footer>Feito com <b>❤</b> para B &amp; H · seus dados nunca saem do seu navegador</footer>
+
+<div class="loader" id="loader" hidden>
+  <svg viewBox="-40 -40 80 76" aria-hidden="true"><path d="M0 24 C-38 -2 -28 -34 -9 -29 C-4 -27.5 0 -22 0 -17 C0 -22 4 -27.5 9 -29 C28 -34 38 -2 0 24 Z" fill="#e11d48" stroke="#5b0f2b" stroke-width="3" stroke-linejoin="round"/></svg>
+  <p id="loadmsg">Contando os beijinhos…</p>
+</div>
+
+<input type="file" id="file" accept=".txt,.zip,text/plain,application/zip,application/x-zip-compressed" hidden>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => Math.round(n).toLocaleString('pt-BR');
+const fmtDec = (n, d) => n.toLocaleString('pt-BR', {minimumFractionDigits: d, maximumFractionDigits: d});
+const fmt1 = n => n.toLocaleString('pt-BR', {maximumFractionDigits: 1});
+const pad = n => String(n).padStart(2, '0');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const MONTHS = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const MONTHS_FULL = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const WD = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const dayDate = d => new Date(d * 86400000);
+const fmtDay = (d, short) => { const x = dayDate(d); return `${pad(x.getUTCDate())}/${pad(x.getUTCMonth()+1)}/${short ? String(x.getUTCFullYear()).slice(2) : x.getUTCFullYear()}`; };
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+/* ---------- corações de fundo ---------- */
+(() => {
+  const box = $('#floaters'), set = ['❤️','💗','💕','💖','✨','💘'];
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('span');
+    s.textContent = set[i % set.length];
+    s.style.cssText = `left:${Math.random()*100}%;font-size:${14+Math.random()*26}px;animation-duration:${12+Math.random()*14}s;animation-delay:${-Math.random()*20}s;--sway:${(Math.random()*80-40).toFixed(0)}px`;
+    box.appendChild(s);
+  }
+})();
+
+/* ---------- explosão de corações ---------- */
+function burst(x, y, n = 14) {
+  const set = ['❤️','💖','💗','💕','💘','✨'];
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span');
+    s.className = 'pop'; s.textContent = set[i % set.length];
+    const ang = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 100;
+    s.style.cssText = `left:${x}px;top:${y}px;--dx:${Math.cos(ang)*dist}px;--dy:${Math.sin(ang)*dist-60}px;font-size:${14+Math.random()*18}px`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 1300);
+  }
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-burst], #logo');
+  if (t) burst(e.clientX, e.clientY);
+});
+
+/* ---------- revelação e contadores ---------- */
+function runCounters(root) {
+  $$('[data-count]', root).forEach(el => {
+    const to = +el.dataset.count, dec = +el.dataset.dec || 0, t0 = performance.now(), dur = 1500;
+    const step = t => {
+      const k = Math.min(1, (t - t0) / dur), v = to * (1 - Math.pow(1 - k, 3));
+      el.textContent = fmtDec(dec ? v : Math.round(v), dec);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+let io = null;
+function observe() {
+  if (io) io.disconnect();
+  const els = $$('#app .reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
+  io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const t = e.target;
+    t.classList.add('in'); runCounters(t);
+    if (t.hasAttribute('data-reveal-burst') && !S.burstDone) {
+      S.burstDone = true;
+      const r = t.getBoundingClientRect();
+      burst(r.left + r.width / 2, Math.max(120, r.top + Math.min(r.height / 2, 200)), 20);
+    }
+    io.unobserve(t);
+  }), {threshold: .12});
+  els.forEach(e => io.observe(e));
+}
+
+/* ---------- leitura do arquivo ---------- */
+const LINE_RE = /^\[?(\d{1,4})[\/.\-](\d{1,2})[\/.\-](\d{1,4}),?\s+(?:às\s+|as\s+|at\s+)?(\d{1,2})[:.](\d{2})(?::(\d{2}))?\s*([AaPp]\.?\s?[Mm]\.?)?\]?\s*(?:[-–—]\s*)?(.*)$/;
+const MISSED_RE = /^(chamada de (voz|v[ií]deo) perdida|chamada perdida|missed (voice|video) call)/i;
+const DELETED_RE = /^(voc[eê] apagou esta mensagem|esta mensagem foi apagada|you deleted this message|this message was deleted|mensagem apagada)/i;
+const ATTACH_RE = /\((arquivo anexado|file attached)\)|<anexado:|<attached:/i;
+const OMIT_RE = /^(<m[ií]dia oculta>|<media omitted>|(imagem|v[ií]deo|[áa]udio|figurinha|gif|documento|contato|sticker|image|video|audio|document|contact card)\s+(ocultad[oa]|omitid[oa]|omitted))$/i;
+const MEDIA_TYPES = [
+  ['audio', /(\.(opus|ogg|m4a|aac|mp3|amr|wav)\b|\bptt-|-audio-|[áa]udio\s+(ocultado|omitido)|audio omitted)/i],
+  ['sticker', /(\bstk-|figurinha|sticker|\.webp\b)/i],
+  ['video', /(\.(mp4|3gp|mov|mkv)\b|v[ií]deo\s+(ocultado|omitido)|video omitted|\bvid-)/i],
+  ['image', /(\.(jpe?g|png|heic|gif)\b|imagem\s+(ocultada|omitida)|image omitted|gif\s+(omitido|ocultado)|\bimg-|-photo-)/i],
+  ['contact', /(\.vcf\b|contato\s+(ocultado|omitido)|contact card)/i],
+  ['doc', /(\.(pdf|docx?|xlsx?|pptx?|zip|txt|csv|apk)\b|documento|document)/i]
+];
+function classify(text) {
+  const t = text.trim();
+  if (DELETED_RE.test(t)) return 'deleted';
+  if (MISSED_RE.test(t)) return 'missed';
+  if (t.length < 260 && (ATTACH_RE.test(t) || OMIT_RE.test(t))) {
+    for (const [k, re] of MEDIA_TYPES) if (re.test(t)) return k;
+    return 'media';
+  }
+  return 'text';
+}
+
+function parseChat(raw) {
+  const text = raw.replace(/^\uFEFF/, '').replace(/[\u200e\u200f\u202a-\u202e]/g, '').replace(/[\u202f\u00a0]/g, ' ');
+  const items = []; let dayVotes = 0, monthVotes = 0;
+  for (const line of text.split(/\r?\n/)) {
+    const m = LINE_RE.exec(line);
+    if (m) {
+      items.push({h: m});
+      if (m[1].length < 4) { if (+m[1] > 12) dayVotes++; if (+m[2] > 12) monthVotes++; }
+    } else items.push({c: line});
+  }
+  const monthFirst = monthVotes > 0 && dayVotes === 0;
+  const msgs = []; let cur = null, missed = 0;
+  for (const it of items) {
+    if (it.c !== undefined) { if (cur) cur.text += '\n' + it.c; continue; }
+    const m = it.h; let y, mo, d;
+    if (m[1].length === 4) { y = +m[1]; mo = +m[2]; d = +m[3]; }
+    else { const a = +m[1], b = +m[2]; y = +m[3]; if (y < 100) y += 2000; if (monthFirst) { mo = a; d = b; } else { d = a; mo = b; } }
+    let h = +m[4]; const mi = +m[5], s = m[6] ? +m[6] : 0;
+    if (m[7]) { const pm = /p/i.test(m[7]); if (pm && h < 12) h += 12; if (!pm && h === 12) h = 0; }
+    if (mo < 1 || mo > 12 || d < 1 || d > 31 || h > 23 || mi > 59) { if (cur) cur.text += '\n' + m[0]; continue; }
+    const rest = m[8], idx = rest.indexOf(': ');
+    if (idx < 1 || idx > 80) { cur = null; if (MISSED_RE.test(rest.trim())) missed++; continue; }
+    cur = {a: rest.slice(0, idx).trim(), t: Date.UTC(y, mo - 1, d, h, mi, s), day: Date.UTC(y, mo - 1, d) / 864e5, h, text: rest.slice(idx + 2)};
+    msgs.push(cur);
+  }
+  if (!msgs.length) throw new Error('Não consegui reconhecer mensagens nesse arquivo. Confira se é a conversa exportada pelo WhatsApp (.txt ou .zip com o .txt dentro).');
+  const counts = new Map(); msgs.forEach(m => counts.set(m.a, (counts.get(m.a) || 0) + 1));
+  if (counts.size < 2) throw new Error('Encontrei só uma pessoa nessa conversa. Preciso de um chat com duas pessoas.');
+  const top = [...counts.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(e => e[0]);
+  top.sort((x, y) => msgs.findIndex(m => m.a === x) - msgs.findIndex(m => m.a === y));
+  const out = [];
+  for (const m of msgs) {
+    const p = top.indexOf(m.a); if (p < 0) continue;
+    m.p = p;
+    m.text = m.text.replace(/\s*<(mensagem editada|this message was edited)>\s*$/i, '').replace(/\s*\((mensagem editada|edited)\)\s*$/i, '');
+    m.k = classify(m.text);
+    if (m.k === 'missed') { missed++; continue; }
+    out.push(m);
+  }
+  out.sort((x, y) => x.t - y.t);
+  return {msgs: out, authors: top, missed};
+}
+
+
+/* ---------- leitura de .zip (sem bibliotecas) ---------- */
+async function inflateRaw(u8) {
+  const ds = new DecompressionStream('deflate-raw');
+  const w = ds.writable.getWriter();
+  w.write(u8).catch(() => {}); w.close().catch(() => {});
+  return new Uint8Array(await new Response(ds.readable).arrayBuffer());
+}
+async function readZipText(file) {
+  const buf = await file.arrayBuffer(), dv = new DataView(buf), u8 = new Uint8Array(buf);
+  let eocd = -1;
+  for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 22 - 65535); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('Não consegui abrir esse .zip. Ele parece estar incompleto ou corrompido.');
+  const total = dv.getUint16(eocd + 10, true); let p = dv.getUint32(eocd + 16, true);
+  const dec = new TextDecoder('utf-8'), entries = [];
+  for (let n = 0; n < total; n++) {
+    if (p + 46 > buf.byteLength || dv.getUint32(p, true) !== 0x02014b50) break;
+    const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), usize = dv.getUint32(p + 24, true);
+    const nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+    entries.push({name: dec.decode(u8.subarray(p + 46, p + 46 + nl)), method, csize, usize, off});
+    p += 46 + nl + el + cl;
+  }
+  const txts = entries.filter(e => /\.txt$/i.test(e.name) && !/(^|\/)(__MACOSX|\._)/.test(e.name));
+  if (!txts.length) throw new Error('Não achei nenhum arquivo .txt dentro desse .zip.');
+  const score = e => /_chat\.txt$|conversa|chat/i.test(e.name) ? 1 : 0;
+  txts.sort((a, b) => score(b) - score(a) || b.usize - a.usize);
+  const e = txts[0];
+  if (e.csize === 0xFFFFFFFF || e.off === 0xFFFFFFFF) throw new Error('Esse .zip é grande demais para abrir aqui. Extraia o .txt e importe ele diretamente.');
+  const nl = dv.getUint16(e.off + 26, true), el = dv.getUint16(e.off + 28, true), start = e.off + 30 + nl + el;
+  const data = u8.subarray(start, start + e.csize);
+  let out;
+  if (e.method === 0) out = data;
+  else if (e.method === 8) {
+    if (typeof DecompressionStream === 'undefined') throw new Error('Seu navegador é antigo para abrir .zip. Atualize-o ou extraia o .txt do zip e importe ele.');
+    out = await inflateRaw(data);
+  } else throw new Error('Esse .zip usa um tipo de compactação que não consigo abrir. Extraia o .txt e importe ele diretamente.');
+  return new TextDecoder('utf-8').decode(out);
+}
+
+/* ---------- análise ---------- */
+const EMOJI_RE = /\p{Regional_Indicator}{2}|[#*0-9]\uFE0F?\u20E3|\p{Extended_Pictographic}(?:\uFE0F|\p{Emoji_Modifier})?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\p{Emoji_Modifier})?)*/gu;
+function emojiKey(e) {
+  const cp = e.codePointAt(0);
+  if ([0xA9, 0xAE, 0x2122, 0x203C, 0x2049, 0x2139].includes(cp)) return null;
+  if (cp >= 0x2190 && cp <= 0x21FF && !e.includes('\uFE0F')) return null;
+  return e.replace(/\uFE0F/g, '');
+}
+function emojiDisp(k) {
+  if (k.endsWith('\u20E3')) return k[0] + '\uFE0F\u20E3';
+  return ([...k].length === 1 && k.codePointAt(0) < 0x10000) ? k + '\uFE0F' : k;
+}
+const STOP = new Set(('que e eh ou se mas como mais muito muita muitos muitas tao tambem tbm tb ja so bem la ai aqui ali ca isso isto esse essa esses essas este esta estes estas aquele aquela aquilo ele ela eles elas voce voces vc vcs eu tu nos me te lhe mim ti meu minha meus minhas seu sua seus suas nosso nossa teu tua dele dela deles delas quem qual quais onde quando porque pq pois entao assim ainda agora depois antes hoje ontem amanha sempre nunca nada tudo todo toda todos todas algo alguem ninguem outro outra mesmo mesma cada vai vou vamos indo ir foi fui era eram ser sao sou somos estou estao estava estavam estamos tava tavam to ta tou tamo tem tenho temos tinha tinham teve ter fazer faz fez fiz pode posso podemos poder quer quero queria queremos num numa nem ate dar deu ver vendo vi veja dizer disse falar falei diz ne ok oi ola kk rs uhum aham blz sim nao pra pro pras pros pelo pela pelos pelas desse dessa nesse nessa disso nisso nele nela daquele coisa coisas gente vez vezes tipo uma uns umas dos das nas nos com sem por para sobre entre mto mta mt tbem tamb vamo bora').split(/\s+/));
+const PHRASES = [
+  {key: 'euteamo', label: 'eu te amo', re: /\beu te amo+\b/g},
+  {key: 'teamo', label: 'te amo', re: /\bte amo+\b/g},
+  {key: 'saudades', label: 'saudades', re: /\b(?:saudades?|sdds?)\b/g},
+  {key: 'teadoro', label: 'te adoro', re: /\bte adoro\b/g},
+  {key: 'tequero', label: 'te quero', re: /\bte quero\b/g},
+  {key: 'amovc', label: 'amo você', re: /\bamo (?:voce|vc)\b/g},
+  {key: 'beijo', label: 'beijos', re: /\bbeij(?:o|os|inho|inhos|ao|oes|oca|ocas)\b/g}
+];
+const NICK_RE = /\b(?:meu amor|minha vida|meu bem|minha princesa|minha linda|meu lindo|amorzinho|amor|vidinha|bebe|bb|nenem|mozao|princesa|linda|lindo|lindinha|lindinho|gatinha|gatinho|fofa|fofo|fofinha|fofinho|coracao|benzinho|anjo|querida|querido|xuxu|gostosa|gostoso|cheirosa|cheiroso|rainha)\b/g;
+
+function analyze(parsed, names) {
+  const {msgs, missed} = parsed;
+  let first = Infinity, last = -Infinity;
+  for (const m of msgs) { if (m.day < first) first = m.day; if (m.day > last) last = m.day; }
+  const span = last - first + 1, z = () => new Array(span).fill(0);
+  const S = {
+    msgs, names, first, last, span, N: msgs.length, missed, cnt: [0, 0], tm: [0, 0], wc: [0, 0],
+    dayMsg: [z(), z()], dayEmo: [z(), z()], hour: [new Array(24).fill(0), new Array(24).fill(0)],
+    heat: Array.from({length: 7}, () => new Array(24).fill(0)), wdTotal: new Array(7).fill(0),
+    emo: new Map(), emoTot: [0, 0], wm: [new Map(), new Map()], nick: [new Map(), new Map()],
+    ph: Object.fromEntries(PHRASES.map(p => [p.key, [0, 0]])),
+    laugh: {tok: [0, 0], msgs: [0, 0], longest: {len: 0, p: -1, day: 0}},
+    media: [{}, {}], deleted: [0, 0], longest: [null, null], burstDone: false
+  };
+  for (const m of msgs) {
+    const p = m.p, di = m.day - first;
+    S.cnt[p]++; S.dayMsg[p][di]++; S.hour[p][m.h]++;
+    const wd = dayDate(m.day).getUTCDay(); S.heat[wd][m.h]++; S.wdTotal[wd]++;
+    const em = m.text.match(EMOJI_RE);
+    if (em) for (const e of em) {
+      const k = emojiKey(e); if (!k) continue;
+      if (!S.emo.has(k)) S.emo.set(k, [0, 0]);
+      S.emo.get(k)[p]++; S.emoTot[p]++; S.dayEmo[p][di]++;
+    }
+    if (m.k === 'deleted') { S.deleted[p]++; continue; }
+    if (m.k !== 'text') { S.media[p][m.k] = (S.media[p][m.k] || 0) + 1; continue; }
+    const t = m.text, low = t.toLowerCase(), nm = norm(t);
+    S.tm[p]++;
+    const toks = low.replace(/https?:\/\/\S+|www\.\S+/g, ' ').match(/\p{L}+/gu) || [];
+    S.wc[p] += toks.length;
+    const wm = S.wm[p];
+    for (const w of toks) {
+      if (w.length < 3) continue;
+      const nw = norm(w);
+      if (STOP.has(nw) || /^k+$/.test(nw) || /^(?:ha|he|rs|hi)+h?$/.test(nw)) continue;
+      wm.set(w, (wm.get(w) || 0) + 1);
+    }
+    for (const P of PHRASES) { const mm = nm.match(P.re); if (mm) S.ph[P.key][p] += mm.length; }
+    const nk = nm.match(NICK_RE);
+    if (nk) for (const k of nk) S.nick[p].set(k, (S.nick[p].get(k) || 0) + 1);
+    let lt = 0;
+    const km = nm.match(/\bk{2,}\b/g);
+    if (km) { lt += km.length; for (const k of km) if (k.length > S.laugh.longest.len) S.laugh.longest = {len: k.length, p, day: m.day}; }
+    const hm = nm.match(/\b(?:(?:ha){2,}h?|(?:he){2,}h?|(?:rs){2,}|(?:hi){2,}h?)\b/g);
+    if (hm) lt += hm.length;
+    if (lt) { S.laugh.tok[p] += lt; S.laugh.msgs[p]++; }
+    if (!S.longest[p] || t.length > S.longest[p].len) S.longest[p] = {len: t.length, words: toks.length, text: t, day: m.day, p};
+  }
+  /* derivados */
+  const d = S.d = {};
+  const tot = d.tot = S.dayMsg[0].map((v, i) => v + S.dayMsg[1][i]);
+  d.activeDays = tot.filter(v => v > 0).length;
+  let best = {len: 0, s: 0, e: 0}, cl = 0, cs = 0;
+  for (let i = 0; i < span; i++) {
+    if (tot[i] > 0) { if (!cl) cs = i; cl++; if (cl > best.len) best = {len: cl, s: cs, e: i}; } else cl = 0;
+  }
+  d.streak = best;
+  d.topDays = tot.map((v, i) => ({v, i})).sort((a, b) => b.v - a.v).slice(0, 5);
+  const occ = new Array(7).fill(0);
+  for (let i = 0; i < span; i++) occ[dayDate(first + i).getUTCDay()]++;
+  d.wdAvg = S.wdTotal.map((v, i) => occ[i] ? v / occ[i] : 0);
+  d.favWd = d.wdAvg.indexOf(Math.max(...d.wdAvg));
+  d.hourTot = S.hour[0].map((v, h) => v + S.hour[1][h]);
+  d.peak = d.hourTot.indexOf(Math.max(...d.hourTot));
+  d.emoList = [...S.emo.entries()].map(([k, v]) => ({k, v, t: v[0] + v[1]})).sort((a, b) => b.t - a.t);
+  d.emoAll = S.emoTot[0] + S.emoTot[1];
+  d.topEmoji = d.emoList[0] || null;
+  const dayEmoTot = S.dayEmo[0].map((v, i) => v + S.dayEmo[1][i]);
+  const emoDay = dayEmoTot.reduce((b, v, i) => v > b.v ? {v, i} : b, {v: -1, i: 0});
+  d.emoDay = emoDay;
+  d.love = {
+    teamo: S.ph.teamo[0] + S.ph.teamo[1],
+    euteamo: S.ph.euteamo[0] + S.ph.euteamo[1],
+    saudades: S.ph.saudades[0] + S.ph.saudades[1]
+  };
+  d.topMonth = monthBuckets(S, 'msg').reduce((b, x) => (x.v[0] + x.v[1]) > (b.v[0] + b.v[1]) ? x : b);
+  d.firstMsg = msgs[0];
+  return S;
+}
+
+function monthBuckets(S, metric) {
+  const src = metric === 'emo' ? S.dayEmo : S.dayMsg, out = []; let lastKey = null;
+  for (let i = 0; i < S.span; i++) {
+    const x = dayDate(S.first + i), key = x.getUTCFullYear() * 12 + x.getUTCMonth();
+    if (key !== lastKey) { out.push({d: S.first + i, end: S.first + i, v: [0, 0], y: x.getUTCFullYear(), m: x.getUTCMonth()}); lastKey = key; }
+    const b = out[out.length - 1]; b.end = S.first + i; b.v[0] += src[0][i]; b.v[1] += src[1][i];
+  }
+  return out;
+}
+function buildSeries(S, metric, gran) {
+  const src = metric === 'emo' ? S.dayEmo : S.dayMsg;
+  if (gran === 'month') return monthBuckets(S, metric).map(b => ({...b, label: `${MONTHS[b.m]}/${b.y}`, short: `${MONTHS[b.m]}/${String(b.y).slice(2)}`}));
+  const out = [], step = gran === 'week' ? 7 : 1;
+  for (let i = 0; i < S.span; i += step) {
+    let v0 = 0, v1 = 0; const e = Math.min(i + step, S.span);
+    for (let j = i; j < e; j++) { v0 += src[0][j]; v1 += src[1][j]; }
+    const d = S.first + i, end = S.first + e - 1;
+    out.push({d, end, v: [v0, v1], label: step === 1 ? fmtDay(d) : `${fmtDay(d, true)} a ${fmtDay(end, true)}`, short: fmtDay(d, true)});
+  }
+  return out;
+}
+function convStats(S, gapH) {
+  const gap = gapH * 3600000, starts = [0, 0], resp = [[], []]; let conv = 0, prev = null;
+  for (const m of S.msgs) {
+    if (!prev || m.t - prev.t > gap) { starts[m.p]++; conv++; }
+    else if (m.p !== prev.p) resp[m.p].push(m.t - prev.t);
+    prev = m;
+  }
+  const stat = a => { if (!a.length) return {med: null, avg: null}; const s = [...a].sort((x, y) => x - y); return {med: s[Math.floor(s.length / 2)], avg: a.reduce((x, y) => x + y, 0) / a.length}; };
+  return {starts, conv, resp: resp.map(stat), n: resp.map(a => a.length)};
+}
+function dur(ms) {
+  if (ms == null) return '—';
+  const s = Math.round(ms / 1000);
+  if (s < 60) return s + ' s';
+  const m = Math.floor(s / 60);
+  if (m < 60) return m + ' min' + (m < 10 && s % 60 ? ` ${s % 60} s` : '');
+  const h = Math.floor(m / 60);
+  return h + ' h' + (m % 60 ? ` ${m % 60} min` : '');
+}
+
+/* ---------- renderização ---------- */
+let S = null;
+const ui = {metric: 'msg', gran: 'month', wmode: 'all', gap: 6};
+const pn = p => `<span class="pn" style="--c:var(--${p ? 'b' : 'a'})">${esc(S.names[p])}</span>`;
+const sec = (id, ico, title, sub, inner, attrs = '') => `<section class="card reveal" id="${id}" ${attrs}><h2 class="sec"><span>${ico}</span>${title}</h2>${sub ? `<p class="sub">${sub}</p>` : ''}${inner}</section>`;
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const splitBar = (a, b) => { const t = a + b || 1; return `<div class="split"><i style="--w:${a / t * 100}%"></i><i style="--w:${b / t * 100}%"></i></div>`; };
+
+function renderHL() {
+  const d = S.d, L = [
+    {i: '💬', l: 'mensagens trocadas', n: S.N, cls: 'big'},
+    {i: '📆', l: 'mensagens por dia, em média', n: S.N / S.span, dec: 1},
+    {i: '💘', l: 'vezes “te amo”', n: d.love.teamo, cls: 'solid'},
+    {i: '🥺', l: 'vezes “saudades”', n: d.love.saudades},
+    {i: '😍', l: `emojis enviados (${fmt1(d.emoAll / S.span)} por dia)`, n: d.emoAll},
+    {i: d.topEmoji ? emojiDisp(d.topEmoji.k) : '✨', l: 'emoji campeão', txt: d.topEmoji ? fmt(d.topEmoji.t) + ' usos' : '—'},
+    {i: '🔥', l: 'dias seguidos conversando (recorde)', n: d.streak.len},
+    {i: '⏰', l: 'horário de pico', txt: `${d.peak}h`},
+    {i: '🌟', l: 'dia da semana favorito', txt: WD[d.favWd]}
+  ];
+  return `<section class="hls reveal">${L.map(it => `<div class="hl ${it.cls || ''}" data-burst><span class="hi">${it.i}</span><b class="hn" ${it.n != null ? `data-count="${it.n}" data-dec="${it.dec || 0}"` : ''}>${it.n != null ? fmtDec(it.dec ? it.n : Math.round(it.n), it.dec || 0) : esc(it.txt)}</b><small>${it.l}</small></div>`).join('')}</section>`;
+}
+
+function renderRetro() {
+  const d = S.d, L = [];
+  L.push(['💌', `Entre <b>${fmtDay(S.first)}</b> e <b>${fmtDay(S.last)}</b> (${fmt(S.span)} dias), vocês trocaram <b>${fmt(S.N)}</b> mensagens, cerca de <b>${fmt1(S.N / S.span)}</b> por dia.`]);
+  const lead = S.cnt[0] >= S.cnt[1] ? 0 : 1, lp = pct(S.cnt[lead], S.N);
+  L.push(['🗣️', Math.abs(S.cnt[0] - S.cnt[1]) / S.N < .04
+    ? `Quase um empate: ${pn(0)} e ${pn(1)} falam praticamente igual (${lp}% e ${100 - lp}%).`
+    : `${pn(lead)} é quem mais fala, com <b>${lp}%</b> das mensagens. ${pn(1 - lead)} fica com ${100 - lp}%.`]);
+  if (d.topEmoji) L.push(['😍', `Foram <b>${fmt(d.emoAll)}</b> emojis, e o queridinho é ${emojiDisp(d.topEmoji.k)}, usado <b>${fmt(d.topEmoji.t)}</b> vezes.`]);
+  L.push(['🔥', `Vocês conversaram em <b>${fmt(d.activeDays)}</b> dos ${fmt(S.span)} dias (${pct(d.activeDays, S.span)}%). A maior sequência foi de <b>${fmt(d.streak.len)}</b> dias seguidos, de ${fmtDay(S.first + d.streak.s, true)} a ${fmtDay(S.first + d.streak.e, true)}.`]);
+  const bd = d.topDays[0];
+  L.push(['🎉', `O dia mais agitado foi <b>${fmtDay(S.first + bd.i)}</b> (${WD[dayDate(S.first + bd.i).getUTCDay()].toLowerCase()}), com <b>${fmt(bd.v)}</b> mensagens. E o mês mais intenso foi <b>${MONTHS_FULL[d.topMonth.m]} de ${d.topMonth.y}</b>.`]);
+  L.push(['⏰', `O horário de pico é entre <b>${d.peak}h e ${(d.peak + 1) % 24}h</b>, e o dia favorito para conversar é <b>${WD[d.favWd].toLowerCase()}</b>.`]);
+  L.push(['💘', `“Te amo” apareceu <b>${fmt(d.love.teamo)}</b> vezes (${fmt(d.love.euteamo)} delas como “eu te amo”) e “saudades” <b>${fmt(d.love.saudades)}</b>.`]);
+  const c = convStats(S, 6);
+  const fast = c.resp[0].med != null && c.resp[1].med != null ? (c.resp[0].med <= c.resp[1].med ? 0 : 1) : -1;
+  if (c.conv > 1) L.push(['💬', `${pn(c.starts[0] >= c.starts[1] ? 0 : 1)} puxa mais assunto: começa ${pct(Math.max(...c.starts), c.conv)}% das conversas.${fast >= 0 ? ` ${pn(fast)} responde mais rápido (mediana de ${dur(c.resp[fast].med)}).` : ''}`]);
+  const fm = d.firstMsg, ft = fm.k === 'text' ? `“${esc(fm.text.trim().slice(0, 90))}${fm.text.trim().length > 90 ? '…' : ''}”` : 'uma mídia';
+  L.push(['🌱', `Tudo começou em <b>${fmtDay(fm.day)}</b>, quando ${pn(fm.p)} mandou ${ft}.`]);
+  return sec('retro', '📖', 'A retrospectiva de vocês', 'Um resumo de tudo, escrito pelos números.',
+    `<ul class="retro">${L.map((x, i) => `<li style="--d:${(i * .13).toFixed(2)}s"><span>${x[0]}</span><div>${x[1]}</div></li>`).join('')}</ul>`);
+}
+
+function renderWho() {
+  const box = p => `<div><span class="nm" style="--c:var(--${p ? 'b' : 'a'})">${esc(S.names[p])}</span><span class="big" style="--c:var(--${p ? 'b' : 'a'})" data-count="${S.cnt[p]}">${fmt(S.cnt[p])}</span><small>${pct(S.cnt[p], S.N)}% das mensagens</small><small>${S.tm[p] ? fmt1(S.wc[p] / S.tm[p]) : 0} palavras por mensagem</small></div>`;
+  return sec('who', '💬', 'Quantas mensagens cada um envia', 'Todas as mensagens contam: texto, fotos, áudios e figurinhas.',
+    `<div class="who">${box(0)}${box(1)}</div><div style="margin-top:16px">${splitBar(S.cnt[0], S.cnt[1])}</div>`);
+}
+
+function renderTimeline() {
+  return sec('time', '📈', 'Mensagens e emojis ao longo do tempo', 'Passe o mouse (ou o dedo) sobre o gráfico para ver cada dia.',
+    `<div class="ctrls">
+      <div class="seg" id="segMetric"><button data-v="msg" class="${ui.metric === 'msg' ? 'on' : ''}">Mensagens</button><button data-v="emo" class="${ui.metric === 'emo' ? 'on' : ''}">Emojis</button></div>
+      <div class="seg" id="segGran"><button data-v="day" class="${ui.gran === 'day' ? 'on' : ''}">Por dia</button><button data-v="week" class="${ui.gran === 'week' ? 'on' : ''}">Por semana</button><button data-v="month" class="${ui.gran === 'month' ? 'on' : ''}">Por mês</button></div>
+    </div>
+    <div class="chart" id="chart"></div>
+    <div class="legend"><span>${pn(0)}</span><span>${pn(1)}</span></div>`);
+}
+const niceMax = v => { if (v <= 5) return 5; const p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; };
+function drawChart() {
+  const box = $('#chart'); if (!box) return;
+  const data = buildSeries(S, ui.metric, ui.gran), n = data.length;
+  const W = 820, H = 300, L = 46, R = 14, T = 14, B = 36;
+  const mx = niceMax(data.reduce((m, b) => Math.max(m, b.v[0], b.v[1]), 1));
+  const x = i => n === 1 ? L + (W - L - R) / 2 : L + (W - L - R) * i / (n - 1);
+  const y = v => T + (H - T - B) * (1 - v / mx);
+  let g = '';
+  for (let k = 0; k <= 4; k++) { const yy = y(mx * k / 4); g += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="#ffe3ea" stroke-width="1.5"/><text x="${L - 8}" y="${yy + 4}" text-anchor="end">${fmt1(mx * k / 4)}</text>`; }
+  const ticks = Math.min(6, n);
+  for (let k = 0; k < ticks; k++) { const i = ticks === 1 ? 0 : Math.round((n - 1) * k / (ticks - 1)); g += `<text x="${x(i)}" y="${H - 12}" text-anchor="${k === 0 ? 'start' : k === ticks - 1 ? 'end' : 'middle'}">${data[i].short}</text>`; }
+  const color = ['var(--a)', 'var(--b)'];
+  let lines = '', areas = '';
+  for (let p = 0; p < 2; p++) {
+    const pts = data.map((b, i) => `${x(i).toFixed(1)},${y(b.v[p]).toFixed(1)}`);
+    if (n > 1) {
+      lines += `<path class="ln" pathLength="1" d="M${pts.join(' L')}" stroke="${color[p]}"/>`;
+      areas += `<path d="M${pts.join(' L')} L${x(n - 1)},${y(0)} L${x(0)},${y(0)} Z" fill="${color[p]}" opacity=".10"/>`;
+    }
+    if (n <= 45) lines += data.map((b, i) => `<circle cx="${x(i)}" cy="${y(b.v[p])}" r="3.6" fill="#fff" stroke="${color[p]}" stroke-width="2.4"/>`).join('');
+  }
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" id="chartsvg" role="img" aria-label="Gráfico ao longo do tempo">${g}${areas}${lines}<line id="guide" y1="${T}" y2="${H - B}" stroke="#ff8fb1" stroke-width="1.5" stroke-dasharray="4 4" opacity="0"/><circle id="d0" r="5" fill="var(--a)" stroke="#fff" stroke-width="2" opacity="0"/><circle id="d1" r="5" fill="var(--b)" stroke="#fff" stroke-width="2" opacity="0"/></svg><div class="tip" id="tip"></div>`;
+  const svg = $('#chartsvg'), tip = $('#tip'), guide = $('#guide'), d0 = $('#d0'), d1 = $('#d1');
+  const show = e => {
+    const r = svg.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * W;
+    const i = Math.max(0, Math.min(n - 1, n === 1 ? 0 : Math.round((px - L) / (W - L - R) * (n - 1)))), b = data[i], cx = x(i);
+    guide.setAttribute('x1', cx); guide.setAttribute('x2', cx); guide.style.opacity = 1;
+    d0.setAttribute('cx', cx); d0.setAttribute('cy', y(b.v[0])); d0.style.opacity = 1;
+    d1.setAttribute('cx', cx); d1.setAttribute('cy', y(b.v[1])); d1.style.opacity = 1;
+    tip.innerHTML = `<b>${esc(b.label)}</b><br>${esc(S.names[0])}: ${fmt(b.v[0])}<br>${esc(S.names[1])}: ${fmt(b.v[1])}`;
+    const bx = box.getBoundingClientRect();
+    tip.style.left = Math.max(70, Math.min(bx.width - 70, e.clientX - bx.left)) + 'px';
+    tip.style.top = (e.clientY - bx.top - 6) + 'px'; tip.style.opacity = 1;
+  };
+  svg.addEventListener('pointermove', show); svg.addEventListener('pointerdown', show);
+  svg.addEventListener('pointerleave', () => { tip.style.opacity = 0; guide.style.opacity = 0; d0.style.opacity = 0; d1.style.opacity = 0; });
+}
+
+function renderEmoji() {
+  const d = S.d, medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  if (!d.emoAll) return sec('emoji', '😍', 'Os emojis de vocês', '', '<p class="mut">Não encontrei emojis nessa conversa.</p>');
+  const fav = p => { let b = null; for (const e of d.emoList) if (!b || e.v[p] > b.v[p]) b = e; return b && b.v[p] ? `${emojiDisp(b.k)} <small>(${fmt(b.v[p])}×)</small>` : '—'; };
+  const rows = d.emoList.slice(0, 5).map((e, i) => `<div class="rank"><span class="medal">${medals[i]}</span><span class="em">${emojiDisp(e.k)}</span><div class="info"><b>${fmt(e.t)} usos</b><small>${esc(S.names[0])}: ${fmt(e.v[0])} · ${esc(S.names[1])}: ${fmt(e.v[1])}</small></div>${splitBar(e.v[0], e.v[1])}</div>`).join('');
+  return sec('emoji', '😍', 'Os emojis de vocês', 'O top 5 dos emojis mais usados, com a divisão entre os dois. Para ver emojis por dia, troque o gráfico lá em cima para “Emojis”.',
+    `<div class="stat"><div><b>${fmt(d.emoAll)}</b><small>emojis no total</small></div><div><b>${fmt1(d.emoAll / S.span)}</b><small>emojis por dia (média)</small></div><div><b>${fmt(S.emoTot[0])} × ${fmt(S.emoTot[1])}</b><small>${esc(S.names[0])} × ${esc(S.names[1])}</small></div><div><b>${d.emoDay.v > 0 ? fmt(d.emoDay.v) : 0}</b><small>recorde em um dia (${fmtDay(S.first + d.emoDay.i, true)})</small></div></div>
+    ${rows}
+    <p class="mut" style="margin-top:12px">Emoji favorito de ${pn(0)}: ${fav(0)} · de ${pn(1)}: ${fav(1)}</p>`);
+}
+
+function renderTimeOfDay() {
+  const d = S.d, P = [{n:'Madrugada',i:'🌙',r:'00h às 05h',a:0,b:5},{n:'Manhã',i:'🌅',r:'06h às 11h',a:6,b:11},{n:'Tarde',i:'☀️',r:'12h às 17h',a:12,b:17},{n:'Noite',i:'🌆',r:'18h às 23h',a:18,b:23}];
+  const cards = P.map(q => {
+    let s0 = 0, s1 = 0; for (let h = q.a; h <= q.b; h++) { s0 += S.hour[0][h]; s1 += S.hour[1][h]; }
+    return `<div class="per"><span class="pi">${q.i}</span><b>${fmt1((s0 + s1) / S.span)}</b><small>mensagens por dia · ${q.n} (${q.r})</small><small>${pct(s0 + s1, S.N)}% de todas as mensagens</small>${splitBar(s0, s1)}</div>`;
+  }).join('');
+  const mx = Math.max(...d.hourTot, 1);
+  const bars = d.hourTot.map((v, h) => `<div class="hb ${h === d.peak ? 'peak' : ''}" title="${h}h: ${fmt(v)} mensagens"><i style="--h:${Math.max(2, v / mx * 100)}%"></i><span>${h % 3 === 0 ? h : ''}</span></div>`).join('');
+  const hm = Math.max(1, ...S.heat.flat());
+  let heat = '<i></i>' + Array.from({length: 24}, (_, h) => `<i>${h % 3 === 0 ? h : ''}</i>`).join('');
+  for (const w of [1,2,3,4,5,6,0]) heat += `<i class="hd">${WD[w].slice(0,3)}</i>` + S.heat[w].map((v, h) => `<i class="hc" style="--v:${(v / hm).toFixed(3)}" title="${WD[w]}, ${h}h: ${fmt(v)} mensagens"></i>`).join('');
+  return sec('tod', '🌙', 'Em que momento do dia vocês conversam', 'A média é o total de mensagens do período dividido pelo número de dias da conversa.',
+    `<div class="periods">${cards}</div><h3>Mensagens por hora (pico às ${d.peak}h ❤)</h3><div class="hours">${bars}</div><h3>Mapa de calor: dia da semana × hora</h3><div class="heatwrap"><div class="heat-grid">${heat}</div></div>`);
+}
+
+function renderDays() {
+  const d = S.d, mxd = d.topDays[0].v || 1, mxw = Math.max(...d.wdAvg, 1);
+  const top = d.topDays.map((t, i) => `<div class="row"><span class="lbl">${i + 1}º</span><div><b>${fmtDay(S.first + t.i)}</b> <small style="display:inline">${WD[dayDate(S.first + t.i).getUTCDay()]}</small><div class="bar"><i style="--w:${t.v / mxd * 100}%"></i></div></div><span class="val">${fmt(t.v)}</span></div>`).join('');
+  const wd = [1,2,3,4,5,6,0].map(w => `<div class="row"><span class="lbl">${WD[w].slice(0,3)}</span><div class="bar"><i style="--w:${d.wdAvg[w] / mxw * 100}%"></i></div><span class="val">${fmt1(d.wdAvg[w])}${w === d.favWd ? ' ❤' : ''}</span></div>`).join('');
+  return sec('days', '🔥', 'Dias mais ativos e sequências', '',
+    `<div class="two"><div><h3>Os 5 dias mais cheios de papo</h3>${top}</div><div><h3>Média de mensagens por dia da semana</h3>${wd}</div></div>
+    <div class="stat" style="margin-top:20px"><div><b>${fmt(d.streak.len)} dias</b><small>maior sequência seguida (${fmtDay(S.first + d.streak.s, true)} a ${fmtDay(S.first + d.streak.e, true)})</small></div><div><b>${fmt(d.activeDays)} de ${fmt(S.span)}</b><small>dias com mensagens (${pct(d.activeDays, S.span)}%)</small></div><div><b>${fmt(S.span - d.activeDays)}</b><small>dias de silêncio</small></div><div><b>${MONTHS_FULL[d.topMonth.m]}/${d.topMonth.y}</b><small>mês mais intenso (${fmt(d.topMonth.v[0] + d.topMonth.v[1])})</small></div></div>`);
+}
+
+function wordsFor(mode) {
+  const m = new Map();
+  if (mode === 'all') { for (const mp of S.wm) for (const [k, v] of mp) m.set(k, (m.get(k) || 0) + v); }
+  else for (const [k, v] of S.wm[mode]) m.set(k, v);
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+function wordsInner() {
+  const list = wordsFor(ui.wmode), top = list.slice(0, 40);
+  if (!top.length) return '<p class="mut">Sem palavras suficientes por aqui.</p>';
+  const mx = top[0][1], pal = ['#be123c','#e11d48','#ff4f8b','#f06bb0','#9f1239','#ff6b87','#d6336c'];
+  const cloud = top.map(([w, c], i) => `<span style="font-size:${(15 + 34 * Math.sqrt(c / mx)).toFixed(0)}px;color:${pal[i % pal.length]};--d:${(i * .03).toFixed(2)}s" title="${fmt(c)} vezes">${esc(w)}</span>`).join('');
+  const rank = list.slice(0, 15).map(([w, c], i) => `<div class="row"><span class="lbl">${i + 1}º</span><div><b>${esc(w)}</b><div class="bar"><i style="--w:${c / mx * 100}%"></i></div></div><span class="val">${fmt(c)}</span></div>`).join('');
+  return `<div class="cloud">${cloud}</div><h3>As 15 palavras mais ditas</h3>${rank}`;
+}
+function renderWords() {
+  return sec('words', '🔤', 'As palavras que mais falamos', 'Sem “de”, “que”, “pra” e outras palavrinhas comuns, para sobrar só o que importa.',
+    `<div class="ctrls"><div class="seg" id="segWords"><button data-v="all" class="${ui.wmode === 'all' ? 'on' : ''}">Os dois</button><button data-v="0" class="${ui.wmode === '0' ? 'on' : ''}">${esc(S.names[0])}</button><button data-v="1" class="${ui.wmode === '1' ? 'on' : ''}">${esc(S.names[1])}</button></div></div><div id="wordsBox">${wordsInner()}</div>`);
+}
+
+function renderLove() {
+  const d = S.d, ph = S.ph, who = k => `${esc(S.names[0])}: ${fmt(ph[k][0])} · ${esc(S.names[1])}: ${fmt(ph[k][1])}`;
+  const extras = PHRASES.slice(3).map(P => `<span class="chip">${P.label}<em>${fmt(ph[P.key][0] + ph[P.key][1])}</em></span>`).join('');
+  const nickList = p => {
+    const l = [...S.nick[p].entries()].sort((a, b) => b[1] - a[1]).slice(0, 6), mx = l.length ? l[0][1] : 1;
+    return l.length ? l.map(([k, c]) => `<div class="row"><span></span><div><b>${esc(k)}</b><div class="bar"><i class="${p ? 'cb' : 'ca'}" style="--w:${c / mx * 100}%"></i></div></div><span class="val">${fmt(c)}</span></div>`).join('') : '<p class="mut">Nenhum apelido encontrado.</p>';
+  };
+  return sec('love', '💘', 'Declarações de amor e saudade', 'Clique nos cartões para soltar uns corações.',
+    `<div class="love">
+      <div class="lv" data-burst><span class="q">eu te amo</span><span class="n" data-count="${d.love.euteamo}">${fmt(d.love.euteamo)}</span><small>${who('euteamo')}</small></div>
+      <div class="lv" data-burst><span class="q">te amo</span><span class="n" data-count="${d.love.teamo}">${fmt(d.love.teamo)}</span><small>${who('teamo')}</small><small>(inclui os “eu te amo”)</small></div>
+      <div class="lv" data-burst><span class="q">saudades</span><span class="n" data-count="${d.love.saudades}">${fmt(d.love.saudades)}</span><small>${who('saudades')}</small></div>
+    </div>
+    <h3>Outras formas de dizer</h3><div class="chips">${extras}</div>
+    <h3>Apelidos e palavras de carinho</h3>
+    <div class="two"><div><p class="mut">Mais usados por ${pn(0)}</p>${nickList(0)}</div><div><p class="mut">Mais usados por ${pn(1)}</p>${nickList(1)}</div></div>`,
+    'data-reveal-burst');
+}
+
+function renderFun() {
+  const L = S.laugh, lg = L.longest, lead = L.tok[0] >= L.tok[1] ? 0 : 1;
+  const kinds = [['image','📸','fotos'],['video','🎥','vídeos'],['audio','🎙️','áudios'],['sticker','🏷️','figurinhas'],['contact','📇','contatos compartilhados'],['doc','📎','documentos'],['media','🖼️','mídias (tipo não identificado)']];
+  const mcell = p => kinds.filter(k => S.media[p][k[0]]).map(k => `<div class="row"><span>${k[1]}</span><b>${k[2]}</b><span class="val">${fmt(S.media[p][k[0]])}</span></div>`).join('') || '<p class="mut">Nenhuma mídia encontrada.</p>';
+  return sec('fun', '😂', 'Risadas, fotos e áudios', '',
+    `<div class="stat"><div><b>${fmt(L.tok[0] + L.tok[1])}</b><small>risadas (kkkk, haha, rsrs)</small></div><div><b>${fmt(L.tok[0])} × ${fmt(L.tok[1])}</b><small>${esc(S.names[0])} × ${esc(S.names[1])}</small></div><div><b>${L.tok[0] + L.tok[1] ? esc(S.names[lead]) : '—'}</b><small>é quem mais ri</small></div></div>
+    ${lg.len ? `<p>🏆 A maior risada foi de ${pn(lg.p)} em ${fmtDay(lg.day)}: <b style="color:var(--crimson);overflow-wrap:anywhere">${'k'.repeat(Math.min(lg.len, 60))}</b> <span class="mut">(${lg.len} letras)</span></p>` : ''}
+    <h3>Fotos, vídeos e áudios enviados</h3>
+    <div class="two"><div><p class="mut">${pn(0)}</p>${mcell(0)}</div><div><p class="mut">${pn(1)}</p>${mcell(1)}</div></div>
+    <p class="mut" style="margin-top:12px">🗑️ Mensagens apagadas: ${esc(S.names[0])} ${fmt(S.deleted[0])} · ${esc(S.names[1])} ${fmt(S.deleted[1])}${S.missed ? ` · 📞 Chamadas perdidas: ${fmt(S.missed)}` : ''}</p>
+    ${S.media.some(m => m.media) ? '<p class="mut" style="margin-top:8px">💡 Na exportação “Sem mídia” do Android, o WhatsApp não informa se a mídia era foto, vídeo ou áudio. No iPhone, esse detalhe vem junto.</p>' : ''}`);
+}
+
+function convInner() {
+  const c = convStats(S, ui.gap), lp = S.longest.filter(Boolean).sort((a, b) => b.len - a.len)[0];
+  const start = p => `<div class="row"><span class="dot" style="--c:var(--${p ? 'b' : 'a'})"></span><b>${esc(S.names[p])}</b><span class="val">${fmt(c.starts[p])} (${pct(c.starts[p], c.conv)}%)</span></div>`;
+  const resp = p => `<div class="row"><span class="dot" style="--c:var(--${p ? 'b' : 'a'})"></span><div><b>${esc(S.names[p])}</b><small>média de ${dur(c.resp[p].avg)} · ${fmt(c.n[p])} respostas</small></div><span class="val">${dur(c.resp[p].med)}</span></div>`;
+  return `<div class="two">
+    <div><h3>Quem puxa assunto (${fmt(c.conv)} conversas)</h3>${start(0)}${start(1)}${splitBar(c.starts[0], c.starts[1])}</div>
+    <div><h3>Tempo de resposta (mediana)</h3>${resp(0)}${resp(1)}<p class="mut">A mediana é o tempo “típico”, sem ser puxada por respostas bem demoradas.</p></div></div>
+    ${lp ? `<h3>A mensagem mais longa de todas</h3><p class="mut" style="margin-bottom:8px">${pn(lp.p)} em ${fmtDay(lp.day)}: ${fmt(lp.len)} caracteres e ${fmt(lp.words)} palavras</p><div class="quote">${esc(lp.text)}</div>
+    <p class="mut" style="margin-top:8px">Maior mensagem de ${pn(0)}: ${S.longest[0] ? fmt(S.longest[0].len) : 0} caracteres · de ${pn(1)}: ${S.longest[1] ? fmt(S.longest[1].len) : 0} caracteres</p>` : ''}`;
+}
+function renderConv() {
+  return sec('conv', '🕊️', 'Conversas, respostas e a mensagem mais longa', 'Uma nova conversa começa quando passa um tempo de silêncio entre duas mensagens.',
+    `<div class="ctrls"><label class="mut">Silêncio para contar como nova conversa: <select id="gapSel">${[1,3,6,12].map(h => `<option value="${h}" ${ui.gap === h ? 'selected' : ''}>${h} hora${h > 1 ? 's' : ''}</option>`).join('')}</select></label></div><div id="convBox">${convInner()}</div>`);
+}
+
+function render() {
+  const app = $('#app');
+  app.innerHTML = `
+    <div class="toolbar">
+      <div class="names"><span>✏️ Nomes exibidos:</span>
+        <label><span class="dot" style="--c:var(--a)"></span><input class="rn" data-p="0" value="${esc(S.names[0])}" maxlength="24" aria-label="Nome da primeira pessoa"></label>
+        <label><span class="dot" style="--c:var(--b)"></span><input class="rn" data-p="1" value="${esc(S.names[1])}" maxlength="24" aria-label="Nome da segunda pessoa"></label>
+      </div>
+      <button class="btn ghost" id="again" type="button">↩ Importar outra conversa</button>
+    </div>
+    ${renderHL()}${renderRetro()}${renderWho()}${renderTimeline()}${renderEmoji()}${renderTimeOfDay()}${renderDays()}${renderWords()}${renderLove()}${renderFun()}${renderConv()}
+    <p class="mut" style="text-align:center;margin-top:26px">🔒 Nada foi enviado ou guardado. Ao recarregar a página, tudo isso desaparece.</p>`;
+  wire(); drawChart(); observe();
+}
+function wire() {
+  $$('.rn').forEach(inp => inp.addEventListener('change', () => {
+    const p = +inp.dataset.p; S.names[p] = inp.value.trim().slice(0, 24) || S.defaultNames[p];
+    const y = window.scrollY; render(); window.scrollTo(0, y);
+  }));
+  $('#again').onclick = reset;
+  const seg = (id, key, after) => { const el = $(id); if (!el) return; el.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; ui[key] = b.dataset.v; $$('button', el).forEach(x => x.classList.toggle('on', x === b)); after(); }); };
+  seg('#segMetric', 'metric', drawChart);
+  seg('#segGran', 'gran', drawChart);
+  seg('#segWords', 'wmode', () => { $('#wordsBox').innerHTML = wordsInner(); });
+  const gs = $('#gapSel'); if (gs) gs.addEventListener('change', () => { ui.gap = +gs.value; $('#convBox').innerHTML = convInner(); });
+}
+
+/* ---------- fluxo ---------- */
+const fileInput = $('#file'), drop = $('#drop'), errBox = $('#err'), loader = $('#loader');
+const LOAD_MSGS = ['Contando os beijinhos…','Somando os “te amo”…','Pescando os emojis…','Medindo as saudades…','Polindo os corações…'];
+function showErr(msg) { errBox.textContent = msg; errBox.hidden = false; errBox.style.animation = 'none'; void errBox.offsetWidth; errBox.style.animation = ''; }
+function reset() {
+  S = null; ui.metric = 'msg'; ui.wmode = 'all'; ui.gap = 6;
+  if (io) io.disconnect();
+  $('#app').innerHTML = ''; $('#app').hidden = true; drop.hidden = false; errBox.hidden = true;
+  document.body.classList.remove('loaded'); fileInput.value = '';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+async function handleFile(file) {
+  if (!file) return;
+  errBox.hidden = true;
+  loader.hidden = false;
+  let i = 0; $('#loadmsg').textContent = LOAD_MSGS[0];
+  const timer = setInterval(() => { i = (i + 1) % LOAD_MSGS.length; $('#loadmsg').textContent = LOAD_MSGS[i]; }, 700);
+  const t0 = Date.now();
+  try {
+    const isZip = /\.zip$/i.test(file.name) || /zip/.test(file.type);
+    const raw = isZip ? await readZipText(file) : await file.text();
+    await sleep(60);
+    const parsed = parseChat(raw);
+    const names = parsed.authors.map(a => { const w = a.replace(/\s+/g, ' ').trim(); return w.length > 24 ? w.slice(0, 24) : w; });
+    S = analyze(parsed, names);
+    S.defaultNames = [...names];
+    ui.gran = S.span <= 90 ? 'day' : S.span <= 400 ? 'week' : 'month';
+    const wait = 1900 - (Date.now() - t0); if (wait > 0) await sleep(wait);
+    drop.hidden = true; $('#app').hidden = false; document.body.classList.add('loaded');
+    render();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  } catch (err) {
+    S = null; showErr(err.message || 'Algo deu errado ao ler o arquivo.');
+  } finally {
+    clearInterval(timer); loader.hidden = true; fileInput.value = '';
+  }
+}
+$('#pick').addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+drop.addEventListener('drop', e => handleFile(e.dataTransfer.files[0]));
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => e.preventDefault());
+})();
+</script>
+</body>
+</html>
