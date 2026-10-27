@@ -193,10 +193,35 @@ h3{font-size:1.05rem;font-weight:800;margin:20px 0 10px;color:var(--ink)}
 .heat-grid .hd{text-align:right;padding-right:4px;align-self:center}
 
 /* palavras */
-.cloud{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;align-items:baseline;padding:18px 12px;background:#fff;border-radius:24px;min-height:120px}
-.cloud span{font-weight:900;line-height:1.1;animation:pop-in .6s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--d);cursor:default;transition:transform .2s}
-.cloud span:hover{transform:scale(1.18) rotate(-3deg)}
+.nosel,.nosel *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.cloudbox{position:relative;background:#fff;border-radius:24px;overflow:hidden;min-height:160px}
+.cloudbox svg{display:block;width:100%;height:auto}
+.cw{font-family:'Nunito',system-ui,sans-serif;font-weight:900;cursor:pointer;transform-box:fill-box;transform-origin:center;animation:pop-in .7s cubic-bezier(.3,1.6,.5,1) backwards;transition:transform .2s cubic-bezier(.3,1.6,.5,1),opacity .2s,filter .2s}
+.cw:hover{transform:scale(1.2);filter:drop-shadow(0 4px 6px rgba(190,18,60,.35))}
+.cloudbox svg:hover .cw:not(:hover){opacity:.3}
 @keyframes pop-in{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.cloudhint{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:10px 2px 0}
+.btn.sm{margin:0;padding:8px 18px;font-size:.88rem}
+details.rk{margin-top:14px}
+details.rk summary{cursor:pointer;font-weight:800;color:var(--crimson)}
+.only h3{margin-top:4px}
+.chips .chip em{color:var(--ink-soft);font-size:.82rem}
+.ytable-wrap{overflow-x:auto;background:#fff;border-radius:22px;padding:6px}
+.ytable{border-collapse:separate;border-spacing:0;width:100%;min-width:520px;font-size:.92rem}
+.ytable th,.ytable td{padding:9px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--blush)}
+.ytable th:first-child,.ytable td:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:1;font-weight:700;white-space:normal;min-width:150px}
+.ytable thead th{font-family:'Pacifico',cursive;font-weight:400;font-size:1.25rem;color:var(--crimson)}
+.ytable thead th small{display:block;font-family:'Nunito',sans-serif;font-size:.72rem;color:var(--ink-soft);font-weight:700}
+.ytable tr.grp th{text-align:left;background:var(--blush);color:var(--crimson);font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:900;position:static}
+.ytable td.best{background:#fff0f4;color:var(--crimson);font-weight:900}
+.ytable td.best::before{content:"❤ ";font-size:.7rem}
+.ytable td small{display:block;font-size:.72rem;font-weight:800}
+.ytable td small.up{color:#15803d}.ytable td small.dn{color:#9a6b7b}
+.modal{position:fixed;inset:0;z-index:80;background:rgba(74,13,36,.62);backdrop-filter:blur(4px);display:grid;place-items:center;padding:14px}
+.modal .box{background:#fff;border-radius:28px;max-width:430px;width:100%;max-height:94vh;overflow:auto;padding:16px;text-align:center}
+.modal img{width:100%;height:auto;border-radius:18px;display:block;box-shadow:0 10px 30px -12px rgba(190,18,60,.5)}
+.modal .macts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 6px}
+.modal .macts .btn{margin:0;text-decoration:none;display:inline-block;padding:11px 22px;font-size:.95rem}
 
 /* amor */
 .love{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
@@ -397,6 +422,7 @@ function observe() {
 const LINE_RE = /^\[?(\d{1,4})[\/.\-](\d{1,2})[\/.\-](\d{1,4}),?\s+(?:às\s+|as\s+|at\s+)?(\d{1,2})[:.](\d{2})(?::(\d{2}))?\s*([AaPp]\.?\s?[Mm]\.?)?\]?\s*(?:[-–—]\s*)?(.*)$/;
 const MISSED_RE = /^(chamada de (voz|v[ií]deo) perdida|chamada perdida|missed (voice|video) call)/i;
 const DELETED_RE = /^(voc[eê] apagou esta mensagem|esta mensagem foi apagada|you deleted this message|this message was deleted|mensagem apagada)/i;
+const WAIT_RE = /^(aguardando mensagem|waiting for this message)/i;
 const ATTACH_RE = /\((arquivo anexado|file attached)\)|<anexado:|<attached:/i;
 const OMIT_RE = /^(<m[ií]dia oculta>|<media omitted>|(imagem|v[ií]deo|[áa]udio|figurinha|gif|documento|contato|sticker|image|video|audio|document|contact card)\s+(ocultad[oa]|omitid[oa]|omitted))$/i;
 const MEDIA_TYPES = [
@@ -409,6 +435,7 @@ const MEDIA_TYPES = [
 ];
 function classify(text) {
   const t = text.trim();
+  if (WAIT_RE.test(t)) return 'waiting';
   if (DELETED_RE.test(t)) return 'deleted';
   if (MISSED_RE.test(t)) return 'missed';
   if (t.length < 260 && (ATTACH_RE.test(t) || OMIT_RE.test(t))) {
@@ -455,6 +482,7 @@ function parseChat(raw) {
     m.text = m.text.replace(/\s*<(mensagem editada|this message was edited)>\s*$/i, '').replace(/\s*\((mensagem editada|edited)\)\s*$/i, '');
     m.k = classify(m.text);
     if (m.k === 'missed') { missed++; continue; }
+    if (m.k === 'waiting') continue;
     out.push(m);
   }
   out.sort((x, y) => x.t - y.t);
@@ -568,20 +596,23 @@ function analyze(parsed, names) {
     emo: new Map(), emoTot: [0, 0], wm: [new Map(), new Map()], nick: [new Map(), new Map()],
     ph: Object.fromEntries(PHRASES.map(p => [p.key, [0, 0]])),
     laugh: {tok: [0, 0], msgs: [0, 0], longest: {len: 0, p: -1, day: 0}},
-    media: [{}, {}], deleted: [0, 0], longest: [null, null], burstDone: false
+    media: [{}, {}], deleted: [0, 0], burstDone: false, Y: new Map()
   };
+  const mkY = y => ({year: y, cnt: [0, 0], emo: [0, 0], emoMap: new Map(), ph: Object.fromEntries(PHRASES.map(q => [q.key, [0, 0]])), laugh: [0, 0], media: [0, 0], wm: new Map(), hour: new Array(24).fill(0), wd: new Array(7).fill(0), days: 0, active: 0, streak: 0, busiest: {v: 0, i: 0}, wdOcc: new Array(7).fill(0)});
+  for (let y = dayDate(first).getUTCFullYear(); y <= dayDate(last).getUTCFullYear(); y++) S.Y.set(y, mkY(y));
   for (const m of msgs) {
     const p = m.p, di = m.day - first;
     S.cnt[p]++; S.dayMsg[p][di]++; S.hour[p][m.h]++;
-    const wd = dayDate(m.day).getUTCDay(); S.heat[wd][m.h]++; S.wdTotal[wd]++;
+    const dt = dayDate(m.day), wd = dt.getUTCDay(), Yr = S.Y.get(dt.getUTCFullYear()); m.y = dt.getUTCFullYear();
+    S.heat[wd][m.h]++; S.wdTotal[wd]++; Yr.cnt[p]++; Yr.hour[m.h]++; Yr.wd[wd]++;
     const em = m.text.match(EMOJI_RE);
     if (em) for (const e of em) {
       const k = emojiKey(e); if (!k) continue;
       if (!S.emo.has(k)) S.emo.set(k, [0, 0]);
-      S.emo.get(k)[p]++; S.emoTot[p]++; S.dayEmo[p][di]++;
+      S.emo.get(k)[p]++; S.emoTot[p]++; S.dayEmo[p][di]++; Yr.emo[p]++; Yr.emoMap.set(k, (Yr.emoMap.get(k) || 0) + 1);
     }
     if (m.k === 'deleted') { S.deleted[p]++; continue; }
-    if (m.k !== 'text') { S.media[p][m.k] = (S.media[p][m.k] || 0) + 1; continue; }
+    if (m.k !== 'text') { S.media[p][m.k] = (S.media[p][m.k] || 0) + 1; Yr.media[p]++; continue; }
     const t = m.text, low = t.toLowerCase(), nm = norm(t);
     S.tm[p]++;
     const toks = low.replace(/https?:\/\/\S+|www\.\S+/g, ' ').match(/\p{L}+/gu) || [];
@@ -591,9 +622,9 @@ function analyze(parsed, names) {
       if (w.length < 3) continue;
       const nw = norm(w);
       if (STOP.has(nw) || /^k+$/.test(nw) || /^(?:ha|he|rs|hi)+h?$/.test(nw)) continue;
-      wm.set(w, (wm.get(w) || 0) + 1);
+      wm.set(w, (wm.get(w) || 0) + 1); Yr.wm.set(w, (Yr.wm.get(w) || 0) + 1);
     }
-    for (const P of PHRASES) { const mm = nm.match(P.re); if (mm) S.ph[P.key][p] += mm.length; }
+    for (const P of PHRASES) { const mm = nm.match(P.re); if (mm) { S.ph[P.key][p] += mm.length; Yr.ph[P.key][p] += mm.length; } }
     const nk = nm.match(NICK_RE);
     if (nk) for (const k of nk) S.nick[p].set(k, (S.nick[p].get(k) || 0) + 1);
     let lt = 0;
@@ -601,8 +632,7 @@ function analyze(parsed, names) {
     if (km) { lt += km.length; for (const k of km) if (k.length > S.laugh.longest.len) S.laugh.longest = {len: k.length, p, day: m.day}; }
     const hm = nm.match(/\b(?:(?:ha){2,}h?|(?:he){2,}h?|(?:rs){2,}|(?:hi){2,}h?)\b/g);
     if (hm) lt += hm.length;
-    if (lt) { S.laugh.tok[p] += lt; S.laugh.msgs[p]++; }
-    if (!S.longest[p] || t.length > S.longest[p].len) S.longest[p] = {len: t.length, words: toks.length, text: t, day: m.day, p};
+    if (lt) { S.laugh.tok[p] += lt; S.laugh.msgs[p]++; Yr.laugh[p] += lt; }
   }
   /* derivados */
   const d = S.d = {};
@@ -632,7 +662,22 @@ function analyze(parsed, names) {
     saudades: S.ph.saudades[0] + S.ph.saudades[1]
   };
   d.topMonth = monthBuckets(S, 'msg').reduce((b, x) => (x.v[0] + x.v[1]) > (b.v[0] + b.v[1]) ? x : b);
-  d.firstMsg = msgs[0];
+  S.hasSec = msgs.some(m => m.t % 60000 !== 0);
+  d.firstMsg = msgs.find(m => m.k !== 'deleted') || msgs[0];
+  { let run = 0, ly = null;
+    for (let i = 0; i < span; i++) {
+      const dt = dayDate(first + i), yy = dt.getUTCFullYear(), Yr = S.Y.get(yy);
+      if (yy !== ly) { run = 0; ly = yy; }
+      Yr.days++; Yr.wdOcc[dt.getUTCDay()]++;
+      if (tot[i] > 0) { Yr.active++; run++; if (run > Yr.streak) Yr.streak = run; if (tot[i] > Yr.busiest.v) Yr.busiest = {v: tot[i], i}; } else run = 0;
+    }
+    for (const Yr of S.Y.values()) {
+      Yr.topEmoji = [...Yr.emoMap.entries()].sort((a, b) => b[1] - a[1])[0] || null;
+      Yr.topWords = [...Yr.wm.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(e => e[0]);
+      Yr.peak = Yr.hour.indexOf(Math.max(...Yr.hour));
+      const av = Yr.wd.map((v, i) => Yr.wdOcc[i] ? v / Yr.wdOcc[i] : 0); Yr.favWd = av.indexOf(Math.max(...av));
+    }
+  }
   return S;
 }
 
@@ -657,9 +702,9 @@ function buildSeries(S, metric, gran) {
   }
   return out;
 }
-function convStats(S, gapH) {
+function convStats(S, gapH, yr) {
   const gap = gapH * 3600000, starts = [0, 0], resp = [[], []]; let conv = 0, prev = null;
-  for (const m of S.msgs) {
+  for (const m of (yr == null ? S.msgs : S.msgs.filter(x => x.y === yr))) {
     if (!prev || m.t - prev.t > gap) { starts[m.p]++; conv++; }
     else if (m.p !== prev.p) resp[m.p].push(m.t - prev.t);
     prev = m;
@@ -670,7 +715,7 @@ function convStats(S, gapH) {
 function dur(ms) {
   if (ms == null) return '—';
   const s = Math.round(ms / 1000);
-  if (s < 60) return s + ' s';
+  if (s < 60) return (S && S.hasSec) ? s + ' s' : 'menos de 1 min';
   const m = Math.floor(s / 60);
   if (m < 60) return m + ' min' + (m < 10 && s % 60 ? ` ${s % 60} s` : '');
   const h = Math.floor(m / 60);
@@ -679,7 +724,7 @@ function dur(ms) {
 
 /* ---------- renderização ---------- */
 let S = null;
-const ui = {metric: 'msg', gran: 'month', wmode: 'all', gap: 6};
+const ui = {metric: 'msg', gran: 'month', wmode: 'all', gap: 6, seed: Math.floor(Math.random() * 1e9)};
 const pn = p => `<span class="pn" style="--c:var(--${p ? 'b' : 'a'})">${esc(S.names[p])}</span>`;
 const sec = (id, ico, title, sub, inner, attrs = '') => `<section class="card reveal" id="${id}" ${attrs}><h2 class="sec"><span>${ico}</span>${title}</h2>${sub ? `<p class="sub">${sub}</p>` : ''}${inner}</section>`;
 const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
@@ -697,7 +742,7 @@ function renderHL() {
     {i: '⏰', l: 'horário de pico', txt: `${d.peak}h`},
     {i: '🌟', l: 'dia da semana favorito', txt: WD[d.favWd]}
   ];
-  return `<section class="hls reveal">${L.map(it => `<div class="hl ${it.cls || ''}" data-burst><span class="hi">${it.i}</span><b class="hn" ${it.n != null ? `data-count="${it.n}" data-dec="${it.dec || 0}"` : ''}>${it.n != null ? fmtDec(it.dec ? it.n : Math.round(it.n), it.dec || 0) : esc(it.txt)}</b><small>${it.l}</small></div>`).join('')}</section>`;
+  return `<section class="hls reveal nosel">${L.map(it => `<div class="hl ${it.cls || ''}" data-burst><span class="hi">${it.i}</span><b class="hn" ${it.n != null ? `data-count="${it.n}" data-dec="${it.dec || 0}"` : ''}>${it.n != null ? fmtDec(it.dec ? it.n : Math.round(it.n), it.dec || 0) : esc(it.txt)}</b><small>${it.l}</small></div>`).join('')}</section>`;
 }
 
 function renderRetro() {
@@ -714,12 +759,13 @@ function renderRetro() {
   L.push(['⏰', `O horário de pico é entre <b>${d.peak}h e ${(d.peak + 1) % 24}h</b>, e o dia favorito para conversar é <b>${WD[d.favWd].toLowerCase()}</b>.`]);
   L.push(['💘', `“Te amo” apareceu <b>${fmt(d.love.teamo)}</b> vezes (${fmt(d.love.euteamo)} delas como “eu te amo”) e “saudades” <b>${fmt(d.love.saudades)}</b>.`]);
   const c = convStats(S, 6);
-  const fast = c.resp[0].med != null && c.resp[1].med != null ? (c.resp[0].med <= c.resp[1].med ? 0 : 1) : -1;
+  const r0 = c.resp[0].med, r1 = c.resp[1].med;
+  const fast = r0 != null && r1 != null && Math.abs(r0 - r1) > Math.max(30000, Math.min(r0, r1) * .1) ? (r0 < r1 ? 0 : 1) : -1;
   if (c.conv > 1) L.push(['💬', `${pn(c.starts[0] >= c.starts[1] ? 0 : 1)} puxa mais assunto: começa ${pct(Math.max(...c.starts), c.conv)}% das conversas.${fast >= 0 ? ` ${pn(fast)} responde mais rápido (mediana de ${dur(c.resp[fast].med)}).` : ''}`]);
   const fm = d.firstMsg, ft = fm.k === 'text' ? `“${esc(fm.text.trim().slice(0, 90))}${fm.text.trim().length > 90 ? '…' : ''}”` : 'uma mídia';
   L.push(['🌱', `Tudo começou em <b>${fmtDay(fm.day)}</b>, quando ${pn(fm.p)} mandou ${ft}.`]);
   return sec('retro', '📖', 'A retrospectiva de vocês', 'Um resumo de tudo, escrito pelos números.',
-    `<ul class="retro">${L.map((x, i) => `<li style="--d:${(i * .13).toFixed(2)}s"><span>${x[0]}</span><div>${x[1]}</div></li>`).join('')}</ul>`);
+    `<ul class="retro">${L.map((x, i) => `<li style="--d:${(i * .13).toFixed(2)}s"><span>${x[0]}</span><div>${x[1]}</div></li>`).join('')}</ul><div style="text-align:center"><button class="btn" data-share type="button">📸 Baixar retrospectiva como imagem</button></div>`);
 }
 
 function renderWho() {
@@ -731,10 +777,10 @@ function renderWho() {
 function renderTimeline() {
   return sec('time', '📈', 'Mensagens e emojis ao longo do tempo', 'Passe o mouse (ou o dedo) sobre o gráfico para ver cada dia.',
     `<div class="ctrls">
-      <div class="seg" id="segMetric"><button data-v="msg" class="${ui.metric === 'msg' ? 'on' : ''}">Mensagens</button><button data-v="emo" class="${ui.metric === 'emo' ? 'on' : ''}">Emojis</button></div>
-      <div class="seg" id="segGran"><button data-v="day" class="${ui.gran === 'day' ? 'on' : ''}">Por dia</button><button data-v="week" class="${ui.gran === 'week' ? 'on' : ''}">Por semana</button><button data-v="month" class="${ui.gran === 'month' ? 'on' : ''}">Por mês</button></div>
+      <div class="seg nosel" id="segMetric"><button data-v="msg" class="${ui.metric === 'msg' ? 'on' : ''}">Mensagens</button><button data-v="emo" class="${ui.metric === 'emo' ? 'on' : ''}">Emojis</button></div>
+      <div class="seg nosel" id="segGran"><button data-v="day" class="${ui.gran === 'day' ? 'on' : ''}">Por dia</button><button data-v="week" class="${ui.gran === 'week' ? 'on' : ''}">Por semana</button><button data-v="month" class="${ui.gran === 'month' ? 'on' : ''}">Por mês</button></div>
     </div>
-    <div class="chart" id="chart"></div>
+    <div class="chart nosel" id="chart"></div>
     <div class="legend"><span>${pn(0)}</span><span>${pn(1)}</span></div>`);
 }
 const niceMax = v => { if (v <= 5) return 5; const p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; };
@@ -799,7 +845,7 @@ function renderTimeOfDay() {
   let heat = '<i></i>' + Array.from({length: 24}, (_, h) => `<i>${h % 3 === 0 ? h : ''}</i>`).join('');
   for (const w of [1,2,3,4,5,6,0]) heat += `<i class="hd">${WD[w].slice(0,3)}</i>` + S.heat[w].map((v, h) => `<i class="hc" style="--v:${(v / hm).toFixed(3)}" title="${WD[w]}, ${h}h: ${fmt(v)} mensagens"></i>`).join('');
   return sec('tod', '🌙', 'Em que momento do dia vocês conversam', 'A média é o total de mensagens do período dividido pelo número de dias da conversa.',
-    `<div class="periods">${cards}</div><h3>Mensagens por hora (pico às ${d.peak}h ❤)</h3><div class="hours">${bars}</div><h3>Mapa de calor: dia da semana × hora</h3><div class="heatwrap"><div class="heat-grid">${heat}</div></div>`);
+    `<div class="periods">${cards}</div><h3>Mensagens por hora (pico às ${d.peak}h ❤)</h3><div class="hours nosel">${bars}</div><h3>Mapa de calor: dia da semana × hora</h3><div class="heatwrap"><div class="heat-grid">${heat}</div></div>`);
 }
 
 function renderDays() {
@@ -817,17 +863,73 @@ function wordsFor(mode) {
   else for (const [k, v] of S.wm[mode]) m.set(k, v);
   return [...m.entries()].sort((a, b) => b[1] - a[1]);
 }
-function wordsInner() {
-  const list = wordsFor(ui.wmode), top = list.slice(0, 40);
-  if (!top.length) return '<p class="mut">Sem palavras suficientes por aqui.</p>';
-  const mx = top[0][1], pal = ['#be123c','#e11d48','#ff4f8b','#f06bb0','#9f1239','#ff6b87','#d6336c'];
-  const cloud = top.map(([w, c], i) => `<span style="font-size:${(15 + 34 * Math.sqrt(c / mx)).toFixed(0)}px;color:${pal[i % pal.length]};--d:${(i * .03).toFixed(2)}s" title="${fmt(c)} vezes">${esc(w)}</span>`).join('');
-  const rank = list.slice(0, 15).map(([w, c], i) => `<div class="row"><span class="lbl">${i + 1}º</span><div><b>${esc(w)}</b><div class="bar"><i style="--w:${c / mx * 100}%"></i></div></div><span class="val">${fmt(c)}</span></div>`).join('');
-  return `<div class="cloud">${cloud}</div><h3>As 15 palavras mais ditas</h3>${rank}`;
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let _mctx = null;
+function textWidth(w, size) {
+  if (_mctx === null) { try { _mctx = document.createElement('canvas').getContext('2d') || false; } catch (e) { _mctx = false; } }
+  if (!_mctx) return w.length * size * .58;
+  _mctx.font = `900 ${size}px Nunito, system-ui, sans-serif`;
+  return _mctx.measureText(w).width;
+}
+/* espalha as palavras em espiral: as maiores no centro, as menores ao redor, em posições "bagunçadas" */
+function cloudLayout(list, W, H, seed) {
+  const rnd = mulberry32(seed), max = list[0][1], k = Math.max(.62, Math.min(1, W / 900)), placed = [], out = [];
+  const hit = r => placed.some(q => r.x < q.x + q.w + 5 && r.x + r.w + 5 > q.x && r.y < q.y + q.h + 3 && r.y + r.h + 3 > q.y);
+  list.forEach(([w, c], idx) => {
+    let size = Math.max(11, (13 + 66 * Math.pow(c / max, .6)) * k); const rot = idx > 5 && rnd() < .18;
+    for (let tries = 0; tries < 8; tries++) {
+      const tw = textWidth(w, size) * 1.02, th = size * .92, bw = rot ? th : tw, bh = rot ? tw : th, a0 = rnd() * Math.PI * 2;
+      for (let t = 0; t < 280; t += .12) {
+        const r = t * 3.1, px = W / 2 + Math.cos(t + a0) * r * 1.7, py = H / 2 + Math.sin(t + a0) * r;
+        const rect = {x: px - bw / 2, y: py - bh / 2, w: bw, h: bh};
+        if (rect.x < 4 || rect.y < 4 || rect.x + rect.w > W - 4 || rect.y + rect.h > H - 4) continue;
+        if (!hit(rect)) { placed.push(rect); out.push({w, c, x: px, y: py, size, rot}); return; }
+      }
+      size *= .88; if (size < 9) return;
+    }
+  });
+  return out;
+}
+function drawCloud() {
+  const box = $('#cloudBox'); if (!box) return;
+  const W = Math.max(300, Math.floor(box.clientWidth) || 900), H = Math.round(W < 520 ? W * 1.05 : W * .52);
+  const list = wordsFor(ui.wmode).slice(0, W < 520 ? 36 : 64);
+  box.dataset.w = W;
+  if (!list.length) { box.innerHTML = '<p class="mut" style="padding:24px">Sem palavras suficientes por aqui.</p>'; return; }
+  const items = cloudLayout(list, W, H, ui.seed), pal = ['#be123c', '#e11d48', '#ff4f8b', '#f06bb0', '#9f1239', '#ff6b87', '#d6336c'];
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Mapa de palavras">${items.map((o, i) =>
+    `<g ${o.rot ? `transform="rotate(-90 ${o.x.toFixed(1)} ${o.y.toFixed(1)})"` : ''}><text class="cw" data-w="${esc(o.w)}" x="${o.x.toFixed(1)}" y="${o.y.toFixed(1)}" dy=".35em" text-anchor="middle" font-size="${o.size.toFixed(1)}" fill="${pal[i % pal.length]}" style="animation-delay:${(i * .02).toFixed(2)}s">${esc(o.w)}</text></g>`).join('')}</svg><div class="tip" id="ctip"></div>`;
+  const tip = $('#ctip');
+  const show = e => {
+    const t = e.target.closest ? e.target.closest('.cw') : null;
+    if (!t) { tip.style.opacity = 0; return; }
+    const w = t.dataset.w, a = S.wm[0].get(w) || 0, b = S.wm[1].get(w) || 0, r = box.getBoundingClientRect();
+    tip.innerHTML = `<b>${esc(w)}</b><br>${fmt(a + b)} ${a + b === 1 ? 'vez' : 'vezes'}<br>${esc(S.names[0])}: ${fmt(a)} · ${esc(S.names[1])}: ${fmt(b)}`;
+    tip.style.left = Math.max(80, Math.min(r.width - 80, e.clientX - r.left)) + 'px';
+    tip.style.top = Math.max(50, e.clientY - r.top - 10) + 'px'; tip.style.opacity = 1;
+  };
+  box.onpointermove = show; box.onpointerdown = show; box.onpointerleave = () => { tip.style.opacity = 0; };
+}
+function rankInner() {
+  const list = wordsFor(ui.wmode).slice(0, 15), mx = list.length ? list[0][1] : 1;
+  return list.map(([w, c], i) => `<div class="row"><span class="lbl">${i + 1}º</span><div><b>${esc(w)}</b><div class="bar"><i style="--w:${c / mx * 100}%"></i></div></div><span class="val">${fmt(c)}</span></div>`).join('');
 }
 function renderWords() {
-  return sec('words', '🔤', 'As palavras que mais falamos', 'Sem “de”, “que”, “pra” e outras palavrinhas comuns, para sobrar só o que importa.',
-    `<div class="ctrls"><div class="seg" id="segWords"><button data-v="all" class="${ui.wmode === 'all' ? 'on' : ''}">Os dois</button><button data-v="0" class="${ui.wmode === '0' ? 'on' : ''}">${esc(S.names[0])}</button><button data-v="1" class="${ui.wmode === '1' ? 'on' : ''}">${esc(S.names[1])}</button></div></div><div id="wordsBox">${wordsInner()}</div>`);
+  return sec('words', '🔤', 'As palavras que mais falamos', 'Um mapa das palavras de vocês: quanto maior, mais ela aparece. Passe o mouse (ou toque) em cada uma para descobrir quantas vezes foi dita.',
+    `<div class="ctrls"><div class="seg nosel" id="segWords"><button data-v="all" class="${ui.wmode === 'all' ? 'on' : ''}">Os dois</button><button data-v="0" class="${ui.wmode === '0' ? 'on' : ''}">${esc(S.names[0])}</button><button data-v="1" class="${ui.wmode === '1' ? 'on' : ''}">${esc(S.names[1])}</button></div></div>
+    <div class="cloudbox nosel" id="cloudBox"></div>
+    <div class="cloudhint"><span class="mut">Sem “de”, “que”, “pra” e outras palavrinhas comuns.</span><button class="btn ghost sm" id="shuffle" type="button">🔀 Misturar de novo</button></div>
+    <details class="rk"><summary>Ver o ranking das 15 mais ditas</summary><div id="rankBox">${rankInner()}</div></details>`);
+}
+function onlyList(p) {
+  const other = S.wm[1 - p], min = S.N > 20000 ? 6 : S.N > 3000 ? 4 : 2;
+  return [...S.wm[p].entries()].filter(([w, c]) => c >= min && !other.has(w)).sort((a, b) => b[1] - a[1]).slice(0, 18);
+}
+function renderOnly() {
+  const min = S.N > 20000 ? 6 : S.N > 3000 ? 4 : 2;
+  const col = p => { const l = onlyList(p); return `<div class="only"><h3>Só ${pn(p)} fala</h3><div class="chips">${l.length ? l.map(([w, c]) => `<span class="chip">${esc(w)}<em>${fmt(c)}×</em></span>`).join('') : '<p class="mut">Nenhuma palavra exclusiva por aqui.</p>'}</div></div>`; };
+  return sec('only', '🗝️', 'Palavras que só um de nós fala', `Palavras ditas por apenas um dos dois (pelo menos ${min} vezes) e nunca pelo outro. É o vocabulário secreto de cada um.`,
+    `<div class="two">${col(0)}${col(1)}</div>`);
 }
 
 function renderLove() {
@@ -838,7 +940,7 @@ function renderLove() {
     return l.length ? l.map(([k, c]) => `<div class="row"><span></span><div><b>${esc(k)}</b><div class="bar"><i class="${p ? 'cb' : 'ca'}" style="--w:${c / mx * 100}%"></i></div></div><span class="val">${fmt(c)}</span></div>`).join('') : '<p class="mut">Nenhum apelido encontrado.</p>';
   };
   return sec('love', '💘', 'Declarações de amor e saudade', 'Clique nos cartões para soltar uns corações.',
-    `<div class="love">
+    `<div class="love nosel">
       <div class="lv" data-burst><span class="q">eu te amo</span><span class="n" data-count="${d.love.euteamo}">${fmt(d.love.euteamo)}</span><small>${who('euteamo')}</small></div>
       <div class="lv" data-burst><span class="q">te amo</span><span class="n" data-count="${d.love.teamo}">${fmt(d.love.teamo)}</span><small>${who('teamo')}</small><small>(inclui os “eu te amo”)</small></div>
       <div class="lv" data-burst><span class="q">saudades</span><span class="n" data-count="${d.love.saudades}">${fmt(d.love.saudades)}</span><small>${who('saudades')}</small></div>
@@ -863,18 +965,162 @@ function renderFun() {
 }
 
 function convInner() {
-  const c = convStats(S, ui.gap), lp = S.longest.filter(Boolean).sort((a, b) => b.len - a.len)[0];
+  const c = convStats(S, ui.gap);
   const start = p => `<div class="row"><span class="dot" style="--c:var(--${p ? 'b' : 'a'})"></span><b>${esc(S.names[p])}</b><span class="val">${fmt(c.starts[p])} (${pct(c.starts[p], c.conv)}%)</span></div>`;
   const resp = p => `<div class="row"><span class="dot" style="--c:var(--${p ? 'b' : 'a'})"></span><div><b>${esc(S.names[p])}</b><small>média de ${dur(c.resp[p].avg)} · ${fmt(c.n[p])} respostas</small></div><span class="val">${dur(c.resp[p].med)}</span></div>`;
   return `<div class="two">
     <div><h3>Quem puxa assunto (${fmt(c.conv)} conversas)</h3>${start(0)}${start(1)}${splitBar(c.starts[0], c.starts[1])}</div>
-    <div><h3>Tempo de resposta (mediana)</h3>${resp(0)}${resp(1)}<p class="mut">A mediana é o tempo “típico”, sem ser puxada por respostas bem demoradas.</p></div></div>
-    ${lp ? `<h3>A mensagem mais longa de todas</h3><p class="mut" style="margin-bottom:8px">${pn(lp.p)} em ${fmtDay(lp.day)}: ${fmt(lp.len)} caracteres e ${fmt(lp.words)} palavras</p><div class="quote">${esc(lp.text)}</div>
-    <p class="mut" style="margin-top:8px">Maior mensagem de ${pn(0)}: ${S.longest[0] ? fmt(S.longest[0].len) : 0} caracteres · de ${pn(1)}: ${S.longest[1] ? fmt(S.longest[1].len) : 0} caracteres</p>` : ''}`;
+    <div><h3>Tempo de resposta (mediana)</h3>${resp(0)}${resp(1)}<p class="mut">A mediana é o tempo “típico”, sem ser puxada por respostas bem demoradas.</p></div></div>`;
 }
 function renderConv() {
-  return sec('conv', '🕊️', 'Conversas, respostas e a mensagem mais longa', 'Uma nova conversa começa quando passa um tempo de silêncio entre duas mensagens.',
+  return sec('conv', '🕊️', 'Conversas e tempo de resposta', 'Uma nova conversa começa quando passa um tempo de silêncio entre duas mensagens.',
     `<div class="ctrls"><label class="mut">Silêncio para contar como nova conversa: <select id="gapSel">${[1,3,6,12].map(h => `<option value="${h}" ${ui.gap === h ? 'selected' : ''}>${h} hora${h > 1 ? 's' : ''}</option>`).join('')}</select></label></div><div id="convBox">${convInner()}</div>`);
+}
+
+/* ---------- ano a ano ---------- */
+function yearsInner() {
+  const ys = [...S.Y.values()];
+  const cs = new Map(ys.map(Y => [Y.year, convStats(S, ui.gap, Y.year)]));
+  const tot = Y => Y.cnt[0] + Y.cnt[1], A = esc(S.names[0]), B = esc(S.names[1]);
+  const num = (t, val, f, o = {}) => ({t, val, f, ...o});
+  const txt = (t, fn) => ({t, txt: fn});
+  const rows = [
+    {g: '💬 Conversa'},
+    num('Mensagens', tot, fmt, {cum: 1}),
+    num('Mensagens por dia', Y => tot(Y) / Y.days, fmt1),
+    num('Dias com conversa', Y => Y.active / Y.days * 100, v => fmt(v) + '%'),
+    num('Maior sequência de dias seguidos', Y => Y.streak, fmt),
+    txt('Dia mais cheio', Y => Y.busiest.v ? `${fmt(Y.busiest.v)} · ${fmtDay(S.first + Y.busiest.i, true)}` : '—'),
+    {g: '🗣️ Quem faz o quê'},
+    num(`Mensagens de ${A}`, Y => Y.cnt[0], fmt, {cum: 1}),
+    num(`Mensagens de ${B}`, Y => Y.cnt[1], fmt, {cum: 1}),
+    txt('Quem puxa mais assunto', Y => { const c = cs.get(Y.year); if (c.conv < 2) return '—'; const l = c.starts[0] >= c.starts[1] ? 0 : 1; return `${esc(S.names[l])} (${pct(c.starts[l], c.conv)}%)`; }),
+    num(`Resposta mediana de ${A}`, Y => cs.get(Y.year).resp[0].med, dur, {best: 'min', notrend: 1}),
+    num(`Resposta mediana de ${B}`, Y => cs.get(Y.year).resp[1].med, dur, {best: 'min', notrend: 1}),
+    {g: '💘 Carinho'},
+    num('“Te amo”', Y => Y.ph.teamo[0] + Y.ph.teamo[1], fmt, {cum: 1}),
+    num('“Eu te amo”', Y => Y.ph.euteamo[0] + Y.ph.euteamo[1], fmt, {cum: 1}),
+    num('“Saudades”', Y => Y.ph.saudades[0] + Y.ph.saudades[1], fmt, {cum: 1}),
+    {g: '😍 Emojis, risadas e mídias'},
+    num('Emojis', Y => Y.emo[0] + Y.emo[1], fmt, {cum: 1}),
+    num('Emojis por dia', Y => (Y.emo[0] + Y.emo[1]) / Y.days, fmt1),
+    txt('Emoji campeão', Y => Y.topEmoji ? `${emojiDisp(Y.topEmoji[0])} ${fmt(Y.topEmoji[1])}×` : '—'),
+    num('Risadas', Y => Y.laugh[0] + Y.laugh[1], fmt, {cum: 1}),
+    num('Mídias enviadas', Y => Y.media[0] + Y.media[1], fmt, {cum: 1}),
+    {g: '⏰ Hábitos'},
+    txt('Horário de pico', Y => tot(Y) ? `${Y.peak}h` : '—'),
+    txt('Dia da semana favorito', Y => tot(Y) ? WD[Y.favWd] : '—'),
+    txt('Palavras mais ditas', Y => Y.topWords.length ? esc(Y.topWords.join(', ')) : '—')
+  ];
+  const head = `<tr><th></th>${ys.map(Y => `<th>${Y.year}${Y.days < 360 ? `<small>${fmt(Y.days)} dias</small>` : ''}</th>`).join('')}</tr>`;
+  const body = rows.map(r => {
+    if (r.g) return `<tr class="grp"><th colspan="${ys.length + 1}">${r.g}</th></tr>`;
+    if (r.txt) return `<tr><td>${r.t}</td>${ys.map(Y => `<td>${r.txt(Y)}</td>`).join('')}</tr>`;
+    const nv = ys.map(Y => { const v = r.val(Y); return v == null || !isFinite(v) ? null : (r.cum ? v / Y.days : v); });
+    const ok = nv.filter(v => v != null), minmax = r.best === 'min' ? Math.min(...ok) : Math.max(...ok);
+    const hasBest = ok.length > 1 && (r.best === 'min' ? true : minmax > 0) && ok.some(v => v !== minmax);
+    return `<tr><td>${r.t}</td>${ys.map((Y, i) => {
+      const v = r.val(Y); if (nv[i] == null) return '<td>—</td>';
+      let arrow = '';
+      if (!r.notrend && i > 0 && nv[i - 1] > 0) { const ch = (nv[i] - nv[i - 1]) / nv[i - 1] * 100; if (Math.abs(ch) >= 1) arrow = `<small class="${ch > 0 ? 'up' : 'dn'}">${ch > 0 ? '▲' : '▼'} ${fmt(Math.abs(ch))}%</small>`; }
+      return `<td class="${hasBest && nv[i] === minmax ? 'best' : ''}">${r.f(v)}${arrow}</td>`;
+    }).join('')}</tr>`;
+  }).join('');
+  return `<div class="ytable-wrap nosel"><table class="ytable"><thead>${head}</thead><tbody>${body}</tbody></table></div>
+    <p class="mut" style="margin-top:12px">❤ marca o melhor ano em cada linha. Como o primeiro e o último ano costumam estar incompletos, nas linhas de totais a comparação usa a média por dia. As setas mostram a variação por dia em relação ao ano anterior.</p>`;
+}
+function renderYears() {
+  const ys = [...S.Y.values()];
+  if (ys.length < 2) return sec('years', '🗓️', 'Ano a ano', '', `<p class="mut">Essa conversa cobre um único ano (${ys[0].year}). A comparação ano a ano aparece quando houver dois ou mais anos.</p>`);
+  return sec('years', '🗓️', 'Ano a ano', 'Todos os assuntos desta página, lado a lado, ano por ano.', `<div id="yearsBox">${yearsInner()}</div>`);
+}
+
+/* ---------- imagem da retrospectiva ---------- */
+function rrect(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); }
+function loadImg(src) { return new Promise((res, rej) => { const i = new Image(); const t = setTimeout(() => rej(new Error('timeout')), 4000); i.onload = () => { clearTimeout(t); res(i); }; i.onerror = e => { clearTimeout(t); rej(e); }; i.src = src; }); }
+async function buildStory(useLogo = true) {
+  const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'), d = S.d;
+  try { await Promise.all([document.fonts.load('900 40px Nunito'), document.fonts.load('800 30px Nunito'), document.fonts.load('40px Pacifico')]); } catch (e) {}
+  const EM = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji"';
+  const F = (w, s) => `${w} ${s}px Nunito, ${EM}, sans-serif`, PF = s => `${s}px Pacifico, cursive, ${EM}`;
+  const fit = (t, maxW, font, size) => { let s = size; do { x.font = font(s); if (x.measureText(t).width <= maxW) break; s -= 2; } while (s > 14); return s; };
+  const g = x.createLinearGradient(0, 0, W * .5, H); g.addColorStop(0, '#fff1f5'); g.addColorStop(.55, '#ffd9e4'); g.addColorStop(1, '#ffb3c9');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const rnd = mulberry32(11); x.textAlign = 'center'; x.textBaseline = 'middle';
+  for (let i = 0; i < 28; i++) { x.globalAlpha = .22 + rnd() * .25; x.font = F(400, 26 + rnd() * 56); x.fillText(['💗', '💕', '💖', '✨', '❤️'][i % 5], rnd() * W, rnd() * H); }
+  x.globalAlpha = 1;
+  /* logo */
+  try {
+    if (!useLogo) throw new Error('sem logo');
+    const lg = $('#logo').cloneNode(true); lg.querySelectorAll('.mini').forEach(e => e.remove()); lg.querySelectorAll('[class]').forEach(e => e.removeAttribute('class')); lg.removeAttribute('class'); lg.removeAttribute('id');
+    lg.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); lg.setAttribute('width', 600); lg.setAttribute('height', 280);
+    const img = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(lg)));
+    x.drawImage(img, (W - 600) / 2, 70, 600, 280);
+  } catch (e) { x.fillStyle = '#be123c'; x.font = PF(120); x.fillText('B ❤ H', W / 2, 200); }
+  x.fillStyle = '#be123c'; x.font = PF(66); x.fillText('Nossa conversa em números', W / 2, 410);
+  x.fillStyle = '#8a4a60'; const nm = `${S.names[0]} ❤ ${S.names[1]}`; x.font = F(800, fit(nm, 900, s => F(800, s), 40)); x.fillText(nm, W / 2, 478);
+  x.font = F(700, 28); x.fillText(`${fmtDay(S.first)} a ${fmtDay(S.last)}`, W / 2, 522);
+  const shadow = () => { x.shadowColor = 'rgba(190,18,60,.28)'; x.shadowBlur = 36; x.shadowOffsetY = 14; }, noShadow = () => { x.shadowColor = 'transparent'; x.shadowBlur = 0; x.shadowOffsetY = 0; };
+  /* destaque */
+  const hg = x.createLinearGradient(60, 560, W - 60, 790); hg.addColorStop(0, '#ff4f8b'); hg.addColorStop(1, '#e11d48');
+  shadow(); x.fillStyle = hg; rrect(x, 60, 560, W - 120, 230, 48); x.fill(); noShadow();
+  x.fillStyle = '#fff'; x.font = F(900, fit(fmt(S.N), 700, s => F(900, s), 140)); x.fillText(fmt(S.N), W / 2, 650);
+  x.font = F(800, 38); x.fillText('mensagens trocadas 💬', W / 2, 726); x.font = F(700, 28); x.globalAlpha = .92; x.fillText(`${fmt1(S.N / S.span)} por dia em média`, W / 2, 764); x.globalAlpha = 1;
+  /* cartões */
+  const cards = [
+    ['💘', fmt(d.love.teamo), '“te amo”'], ['🥺', fmt(d.love.saudades), '“saudades”'],
+    ['😍', fmt(d.emoAll), 'emojis'], [d.topEmoji ? emojiDisp(d.topEmoji.k) : '✨', d.topEmoji ? fmt(d.topEmoji.t) + '×' : '—', 'emoji campeão'],
+    ['🔥', fmt(d.streak.len) + ' dias', 'maior sequência'], ['⏰', d.peak + 'h', 'horário de pico']
+  ];
+  cards.forEach((cd, i) => {
+    const cx = 60 + (i % 2) * 490, cy = 830 + Math.floor(i / 2) * 190, cw = 470, ch = 170;
+    shadow(); x.fillStyle = 'rgba(255,255,255,.93)'; rrect(x, cx, cy, cw, ch, 38); x.fill(); noShadow();
+    x.textAlign = 'left'; x.font = F(400, 56); x.fillText(cd[0], cx + 36, cy + 62);
+    x.fillStyle = '#be123c'; x.font = F(900, fit(cd[1], cw - 150, s => F(900, s), 68)); x.fillText(cd[1], cx + 118, cy + 62);
+    x.fillStyle = '#8a4a60'; x.font = F(800, 30); x.fillText(cd[2], cx + 38, cy + 129); x.textAlign = 'center';
+  });
+  /* quem fala */
+  shadow(); x.fillStyle = 'rgba(255,255,255,.93)'; rrect(x, 60, 1410, W - 120, 190, 38); x.fill(); noShadow();
+  const pa = S.cnt[0] / S.N, bx = 100, bw = W - 200;
+  x.fillStyle = '#ffe3ea'; rrect(x, bx, 1535, bw, 30, 15); x.fill();
+  x.save(); rrect(x, bx, 1535, bw, 30, 15); x.clip(); x.fillStyle = '#e11d48'; x.fillRect(bx, 1535, bw * pa, 30); x.fillStyle = '#f06bb0'; x.fillRect(bx + bw * pa, 1535, bw * (1 - pa), 30); x.restore();
+  x.textAlign = 'left'; x.fillStyle = '#e11d48'; x.font = F(900, fit(S.names[0], 380, s => F(900, s), 40)); x.fillText(S.names[0], bx, 1462);
+  x.font = F(800, 32); x.fillText(`${fmt(S.cnt[0])} · ${pct(S.cnt[0], S.N)}%`, bx, 1503);
+  x.textAlign = 'right'; x.fillStyle = '#d6459a'; x.font = F(900, fit(S.names[1], 380, s => F(900, s), 40)); x.fillText(S.names[1], bx + bw, 1462);
+  x.font = F(800, 32); x.fillText(`${pct(S.cnt[1], S.N)}% · ${fmt(S.cnt[1])}`, bx + bw, 1503); x.textAlign = 'center';
+  /* top emojis */
+  shadow(); x.fillStyle = 'rgba(255,255,255,.93)'; rrect(x, 60, 1630, W - 120, 120, 38); x.fill(); noShadow();
+  const te = d.emoList.slice(0, 5);
+  te.forEach((e, i) => { const px = 60 + (W - 120) * (i + .5) / Math.max(te.length, 1); x.font = F(400, 52); x.fillStyle = '#4a0d24'; x.fillText(emojiDisp(e.k), px, 1676); x.font = F(800, 24); x.fillStyle = '#8a4a60'; x.fillText(fmt(e.t) + '×', px, 1722); });
+  /* palavras */
+  x.font = F(800, 32); const chips = []; let used = 0;
+  for (const w of wordsFor('all').slice(0, 8).map(e => e[0])) { const wd = x.measureText(w).width + 44; if (used + wd + 12 > W - 140) break; chips.push([w, wd]); used += wd + 12; }
+  let px = (W - (used - 12)) / 2; const py = 1798;
+  chips.forEach(([w, wd], k) => { x.fillStyle = k % 2 ? '#ff4f8b' : '#e11d48'; rrect(x, px, py - 25, wd, 50, 25); x.fill(); x.fillStyle = '#fff'; x.fillText(w, px + wd / 2, py + 2); px += wd + 12; });
+  x.fillStyle = '#be123c'; x.font = PF(38); x.fillText('B ❤ H', W / 2, 1873);
+  return c;
+}
+async function openShare() {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = '<div class="box"><p class="sub" style="margin:30px 0">Preparando a sua retrospectiva… 💞</p></div>';
+  document.body.appendChild(m);
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  const close = () => { m.remove(); document.removeEventListener('keydown', onKey); };
+  document.addEventListener('keydown', onKey); m.addEventListener('click', e => { if (e.target === m) close(); });
+  try {
+    let c = await buildStory(), url, blob;
+    try { url = c.toDataURL('image/png'); blob = await new Promise(r => c.toBlob(r, 'image/png')); }
+    catch (e) { c = await buildStory(false); url = c.toDataURL('image/png'); blob = await new Promise(r => c.toBlob(r, 'image/png')); }
+    const file = blob ? new File([blob], 'retrospectiva-B-H.png', {type: 'image/png'}) : null;
+    const canShare = !!(file && navigator.canShare && navigator.canShare({files: [file]}));
+    m.querySelector('.box').innerHTML = `<img src="${url}" alt="Retrospectiva de vocês"><div class="macts"><a class="btn" download="retrospectiva-B-H.png" href="${url}">⬇ Baixar imagem</a>${canShare ? '<button class="btn" id="doShare" type="button">📤 Compartilhar</button>' : ''}<button class="btn ghost" id="mclose" type="button">Fechar</button></div><p class="mut">A imagem tem só números e nomes, nenhuma mensagem. Ela foi criada no seu aparelho.</p>`;
+    $('#mclose', m).onclick = close;
+    const sb = $('#doShare', m); if (sb) sb.onclick = () => navigator.share({files: [file], title: 'Nossa conversa em números', text: '❤'}).catch(() => {});
+  } catch (err) {
+    m.querySelector('.box').innerHTML = '<p class="sub" style="margin:20px 0">Não consegui criar a imagem neste navegador. Tente no Chrome ou no Safari.</p><button class="btn ghost" id="mclose" type="button">Fechar</button>';
+    $('#mclose', m).onclick = close;
+  }
 }
 
 function render() {
@@ -885,11 +1131,12 @@ function render() {
         <label><span class="dot" style="--c:var(--a)"></span><input class="rn" data-p="0" value="${esc(S.names[0])}" maxlength="24" aria-label="Nome da primeira pessoa"></label>
         <label><span class="dot" style="--c:var(--b)"></span><input class="rn" data-p="1" value="${esc(S.names[1])}" maxlength="24" aria-label="Nome da segunda pessoa"></label>
       </div>
-      <button class="btn ghost" id="again" type="button">↩ Importar outra conversa</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-share type="button">📸 Baixar retrospectiva</button><button class="btn ghost" id="again" type="button">↩ Importar outra conversa</button></div>
     </div>
-    ${renderHL()}${renderRetro()}${renderWho()}${renderTimeline()}${renderEmoji()}${renderTimeOfDay()}${renderDays()}${renderWords()}${renderLove()}${renderFun()}${renderConv()}
+    ${renderHL()}${renderRetro()}${renderWho()}${renderTimeline()}${renderEmoji()}${renderTimeOfDay()}${renderDays()}${renderWords()}${renderOnly()}${renderLove()}${renderFun()}${renderConv()}${renderYears()}
     <p class="mut" style="text-align:center;margin-top:26px">🔒 Nada foi enviado ou guardado. Ao recarregar a página, tudo isso desaparece.</p>`;
-  wire(); drawChart(); observe();
+  wire(); drawChart(); drawCloud(); observe();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (S) drawCloud(); });
 }
 function wire() {
   $$('.rn').forEach(inp => inp.addEventListener('change', () => {
@@ -900,8 +1147,10 @@ function wire() {
   const seg = (id, key, after) => { const el = $(id); if (!el) return; el.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; ui[key] = b.dataset.v; $$('button', el).forEach(x => x.classList.toggle('on', x === b)); after(); }); };
   seg('#segMetric', 'metric', drawChart);
   seg('#segGran', 'gran', drawChart);
-  seg('#segWords', 'wmode', () => { $('#wordsBox').innerHTML = wordsInner(); });
-  const gs = $('#gapSel'); if (gs) gs.addEventListener('change', () => { ui.gap = +gs.value; $('#convBox').innerHTML = convInner(); });
+  seg('#segWords', 'wmode', () => { drawCloud(); $('#rankBox').innerHTML = rankInner(); });
+  const sh = $('#shuffle'); if (sh) sh.onclick = () => { ui.seed = Math.floor(Math.random() * 1e9); drawCloud(); };
+  $$('[data-share]').forEach(b => b.onclick = openShare);
+  const gs = $('#gapSel'); if (gs) gs.addEventListener('change', () => { ui.gap = +gs.value; $('#convBox').innerHTML = convInner(); const yb = $('#yearsBox'); if (yb) yb.innerHTML = yearsInner(); });
 }
 
 /* ---------- fluxo ---------- */
@@ -946,6 +1195,7 @@ fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
 ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
 ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
 drop.addEventListener('drop', e => handleFile(e.dataTransfer.files[0]));
+let _rz; window.addEventListener('resize', () => { clearTimeout(_rz); _rz = setTimeout(() => { const b = $('#cloudBox'); if (S && b && Math.abs(b.clientWidth - (+b.dataset.w || 0)) > 20) drawCloud(); }, 250); });
 window.addEventListener('dragover', e => e.preventDefault());
 window.addEventListener('drop', e => e.preventDefault());
 })();
