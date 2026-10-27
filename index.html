@@ -463,40 +463,72 @@ function parseChat(raw) {
 
 
 /* ---------- leitura de .zip (sem bibliotecas) ---------- */
-async function inflateRaw(u8) {
+async function inflateRaw(u8, tolerant) {
   const ds = new DecompressionStream('deflate-raw');
   const w = ds.writable.getWriter();
   w.write(u8).catch(() => {}); w.close().catch(() => {});
-  return new Uint8Array(await new Response(ds.readable).arrayBuffer());
+  const r = ds.readable.getReader(), chunks = []; let n = 0;
+  try { for (;;) { const {done, value} = await r.read(); if (done) break; chunks.push(value); n += value.length; } }
+  catch (e) { if (!tolerant || !n) throw e; }
+  const out = new Uint8Array(n); let o = 0;
+  for (const c of chunks) { out.set(c, o); o += c.length; }
+  return out;
+}
+async function readBytes(file) {
+  if (file.arrayBuffer) { try { return await file.arrayBuffer(); } catch (e) { /* tenta o plano B */ } }
+  return await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsArrayBuffer(file); });
 }
 async function readZipText(file) {
-  const buf = await file.arrayBuffer(), dv = new DataView(buf), u8 = new Uint8Array(buf);
-  let eocd = -1;
-  for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 22 - 65535); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
-  if (eocd < 0) throw new Error('Não consegui abrir esse .zip. Ele parece estar incompleto ou corrompido.');
-  const total = dv.getUint16(eocd + 10, true); let p = dv.getUint32(eocd + 16, true);
+  if (typeof DecompressionStream === 'undefined') throw new Error('Seu navegador é antigo para abrir .zip. Atualize-o ou extraia o .txt do zip e importe ele.');
+  const buf = await readBytes(file), dv = new DataView(buf), u8 = new Uint8Array(buf), len = buf.byteLength;
+  if (!len) throw new Error('O navegador não conseguiu ler o arquivo (0 bytes). Tente salvar o .zip no armazenamento do aparelho e importar de lá, e abra o site no Chrome ou Safari (não dentro de outro app).');
+  const info = `(li ${fmt(len)} de ${fmt(file.size)} bytes)`;
   const dec = new TextDecoder('utf-8'), entries = [];
-  for (let n = 0; n < total; n++) {
-    if (p + 46 > buf.byteLength || dv.getUint32(p, true) !== 0x02014b50) break;
-    const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), usize = dv.getUint32(p + 24, true);
-    const nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
-    entries.push({name: dec.decode(u8.subarray(p + 46, p + 46 + nl)), method, csize, usize, off});
-    p += 46 + nl + el + cl;
+  /* 1) caminho normal: índice (diretório central) no fim do arquivo */
+  let eocd = -1;
+  for (let i = len - 22; i >= Math.max(0, len - 22 - 65535); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd >= 0) {
+    const total = dv.getUint16(eocd + 10, true), cdSize = dv.getUint32(eocd + 12, true);
+    let p = dv.getUint32(eocd + 16, true), delta = 0;
+    if (p + 4 > len || dv.getUint32(p, true) !== 0x02014b50) { const q = eocd - cdSize; if (q >= 0 && dv.getUint32(q, true) === 0x02014b50) { delta = q - p; p = q; } }
+    for (let n = 0; n < total; n++) {
+      if (p + 46 > len || dv.getUint32(p, true) !== 0x02014b50) break;
+      const nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+      entries.push({name: dec.decode(u8.subarray(p + 46, p + 46 + nl)), method: dv.getUint16(p + 10, true), csize: dv.getUint32(p + 20, true), usize: dv.getUint32(p + 24, true), off: dv.getUint32(p + 42, true) + delta});
+      p += 46 + nl + el + cl;
+    }
+  }
+  /* 2) plano B: índice ausente ou ilegível (zip cortado): varre os cabeçalhos locais */
+  let partial = false;
+  if (!entries.some(e => /\.txt$/i.test(e.name))) {
+    partial = true;
+    for (let i = 0; i + 30 < len && entries.length < 5000;) {
+      if (dv.getUint32(i, true) !== 0x04034b50) { i++; continue; }
+      const flag = dv.getUint16(i + 6, true), nl = dv.getUint16(i + 26, true), el = dv.getUint16(i + 28, true), cs = dv.getUint32(i + 18, true);
+      const name = dec.decode(u8.subarray(i + 30, i + 30 + nl));
+      entries.push({name, method: dv.getUint16(i + 8, true), csize: (flag & 8) ? -1 : cs, usize: dv.getUint32(i + 22, true), off: i});
+      i += 30 + nl + el + ((flag & 8) || !cs ? 0 : cs);
+      if (/\.txt$/i.test(name)) break;
+    }
   }
   const txts = entries.filter(e => /\.txt$/i.test(e.name) && !/(^|\/)(__MACOSX|\._)/.test(e.name));
-  if (!txts.length) throw new Error('Não achei nenhum arquivo .txt dentro desse .zip.');
+  if (!txts.length) throw new Error(eocd < 0 ? `Não consegui abrir esse .zip: ele parece incompleto ou corrompido ${info}.` : `Não achei nenhum arquivo .txt dentro desse .zip ${info}.`);
   const score = e => /_chat\.txt$|conversa|chat/i.test(e.name) ? 1 : 0;
   txts.sort((a, b) => score(b) - score(a) || b.usize - a.usize);
   const e = txts[0];
   if (e.csize === 0xFFFFFFFF || e.off === 0xFFFFFFFF) throw new Error('Esse .zip é grande demais para abrir aqui. Extraia o .txt e importe ele diretamente.');
+  if (dv.getUint32(e.off, true) !== 0x04034b50) throw new Error(`Não consegui localizar a conversa dentro do .zip ${info}.`);
   const nl = dv.getUint16(e.off + 26, true), el = dv.getUint16(e.off + 28, true), start = e.off + 30 + nl + el;
-  const data = u8.subarray(start, start + e.csize);
+  const data = u8.subarray(start, e.csize >= 0 ? Math.min(len, start + e.csize) : len);
   let out;
-  if (e.method === 0) out = data;
-  else if (e.method === 8) {
-    if (typeof DecompressionStream === 'undefined') throw new Error('Seu navegador é antigo para abrir .zip. Atualize-o ou extraia o .txt do zip e importe ele.');
-    out = await inflateRaw(data);
-  } else throw new Error('Esse .zip usa um tipo de compactação que não consigo abrir. Extraia o .txt e importe ele diretamente.');
+  try {
+    if (e.method === 0) out = data;
+    else if (e.method === 8) out = await inflateRaw(data, partial);
+    else throw new Error('Esse .zip usa um tipo de compactação que não consigo abrir. Extraia o .txt e importe ele diretamente.');
+  } catch (err) {
+    if (/compactação/.test(err.message)) throw err;
+    throw new Error(`O .zip veio incompleto ou corrompido ${info}. Salve o arquivo de novo no aparelho e tente outra vez.`);
+  }
   return new TextDecoder('utf-8').decode(out);
 }
 
